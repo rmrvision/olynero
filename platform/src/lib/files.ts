@@ -37,13 +37,39 @@ export async function getProjectFiles(projectId: string) {
     return files;
 }
 
-export async function deleteFile(projectId: string, path: string) {
-    return await db.file.delete({
+export async function updateFile(projectId: string, path: string, content: string) {
+    // Upsert: Create if not exists, update if exists
+    // We use findFirst to find by composite key (projectId + path) if strictly enforcing one file per path per project
+    // But since we don't have a unique constraint on (projectId, path) in schema yet (checked previously), 
+    // we should validly use findFirst and update, or create.
+
+    const existingFile = await db.file.findFirst({
         where: {
-            projectId_path: {
+            projectId,
+            path
+        }
+    });
+
+    if (existingFile) {
+        return await db.file.update({
+            where: { id: existingFile.id },
+            data: { content, updatedAt: new Date() }
+        });
+    } else {
+        return await db.file.create({
+            data: {
                 projectId,
                 path,
-            },
+                content
+            }
+        });
+    }
+}
+
+export async function deleteFile(fileId: string) {
+    return await db.file.delete({
+        where: {
+            id: fileId,
         },
     });
 }
