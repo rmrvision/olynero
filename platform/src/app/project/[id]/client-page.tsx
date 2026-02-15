@@ -18,6 +18,7 @@ import { Preview as PreviewPanel } from "@/components/preview/preview-panel";
 import { AgentChat } from "@/components/agent-chat";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ShareDialog } from "@/components/share-dialog";
 
 const getLanguageFromPath = (path: string) => {
     if (path.endsWith(".tsx") || path.endsWith(".ts")) return "typescript";
@@ -31,9 +32,10 @@ const getLanguageFromPath = (path: string) => {
 interface ProjectClientPageProps {
     project: any; // Type this properly later
     files: any[];
+    isReadOnly?: boolean;
 }
 
-export default function ProjectClientPage({ project, files }: ProjectClientPageProps) {
+export default function ProjectClientPage({ project, files, isReadOnly = false }: ProjectClientPageProps) {
     const [fileList, setFileList] = useState(files);
     // Convert flat files to tree
     const fileTree = buildFileTree(fileList);
@@ -41,7 +43,9 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
     const [fileContent, setFileContent] = useState<string>("// Select a file to edit");
 
-    // Boot WebContainer
+    // Boot WebContainer (Only if NOT read-only, or maybe allow read-only execution? strictly safer to disable for now to save resources)
+    // Actually, allowing preview in read-only is cool. Let's keep it but disable interactions if possible? 
+    // For now, let's boot it so they can see the app running!
     const { instance, loading: bootLoading, error: bootError, serverUrl, terminalLogs } = useWebContainer({ files });
 
     const connected = !!instance && !bootLoading;
@@ -64,6 +68,7 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
 
     // Debounced save to DB
     const debouncedSave = useDebouncedCallback(async (projectId: string, path: string, content: string) => {
+        if (isReadOnly) return;
         setIsSaving(true);
         try {
             await saveFileAction(projectId, path, content);
@@ -78,8 +83,11 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
     const handleEditorChange = (value: string | undefined) => {
         if (value === undefined || !selectedFile) return;
 
-        // 1. Update local state
+        // 1. Update local state (Allow typing even in read-only for playground feel, but don't save?)
+        // Better: Make editor read-only if isReadOnly
         setFileContent(value);
+
+        if (isReadOnly) return;
 
         // Update fileList to keep tree in sync (optional but good for consistency)
         setFileList(prev => prev.map(f => f.path === selectedFile ? { ...f, content: value } : f));
@@ -100,6 +108,7 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
     // --- Agent Tools Handlers ---
 
     const handleFileUpdate = async (path: string, content: string) => {
+        if (isReadOnly) { toast.error("Read-only mode"); return; }
         // 1. Write to WebContainer
         if (instance) {
             const cleanPath = path.startsWith('/') ? path.slice(1) : path;
@@ -131,11 +140,13 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
     };
 
     const handleFileCreate = async (path: string, content: string) => {
+        if (isReadOnly) { toast.error("Read-only mode"); return; }
         await handleFileUpdate(path, content);
         toast.success(`Created ${path}`);
     };
 
     const handleFileDelete = async (path: string) => {
+        if (isReadOnly) { toast.error("Read-only mode"); return; }
         // 1. Remove from WebContainer
         if (instance) {
             const cleanPath = path.startsWith('/') ? path.slice(1) : path;
@@ -160,6 +171,7 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
     };
 
     const handleRunCommand = async (command: string) => {
+        if (isReadOnly) { toast.error("Read-only mode"); return; }
         if (!instance) {
             toast.error("Environment not ready");
             return;
@@ -198,6 +210,11 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
                     <div className="flex items-center gap-2">
                         <Code2 className="w-5 h-5 text-indigo-400" />
                         <span className="font-semibold text-sm">{project.name}</span>
+                        {isReadOnly && (
+                            <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] uppercase font-bold tracking-wider">
+                                View Only
+                            </span>
+                        )}
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -207,9 +224,10 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
                             {connected ? 'Connected' : 'Disconnected'}
                         </span>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white hover:bg-white/5">
-                        <Settings className="w-4 h-4" />
-                    </Button>
+                    {/* Share Dialog */}
+                    {!isReadOnly && (
+                        <ShareDialog project={project} userId={project.userId} />
+                    )}
                 </div>
             </header>
 
@@ -322,14 +340,20 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
                                     <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">AI Assistant</span>
                                 </div>
                                 <div className="flex-1 overflow-hidden relative">
-                                    <AgentChat
-                                        projectId={project.id}
-                                        terminalLogs={terminalLogs || []}
-                                        onUpdateFile={handleFileUpdate}
-                                        onCreateFile={handleFileCreate}
-                                        onDeleteFile={handleFileDelete}
-                                        onRunCommand={handleRunCommand}
-                                    />
+                                    {isReadOnly ? (
+                                        <div className="flex items-center justify-center h-full text-neutral-500 text-sm">
+                                            AI Assistant unavailable in View Only mode
+                                        </div>
+                                    ) : (
+                                        <AgentChat
+                                            projectId={project.id}
+                                            terminalLogs={terminalLogs || []}
+                                            onUpdateFile={handleFileUpdate}
+                                            onCreateFile={handleFileCreate}
+                                            onDeleteFile={handleFileDelete}
+                                            onRunCommand={handleRunCommand}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>

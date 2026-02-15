@@ -31,16 +31,29 @@ async function seedProjectFiles(projectId: string, templateName: string) {
     });
 }
 
-export async function getProject(projectId: string, userId: string) {
-    return await db.project.findUnique({
+export async function getProject(projectId: string, userId?: string) {
+    const project = await db.project.findUnique({
         where: {
             id: projectId,
-            userId, // Security: Ensure user owns the project
         },
         include: {
             files: true,
         },
     });
+
+    if (!project) return null;
+
+    // Access control:
+    // 1. Owner can access
+    // 2. Public project can be accessed by anyone
+    const isOwner = userId && project.userId === userId;
+    const isPublic = project.isPublic;
+
+    if (isOwner || isPublic) {
+        return project;
+    }
+
+    return null;
 }
 
 export async function getUserProjects(userId: string) {
@@ -59,6 +72,18 @@ export async function deleteProject(projectId: string, userId: string) {
         where: {
             id: projectId,
             userId,
+        },
+    });
+}
+
+export async function updateProjectVisibility(projectId: string, userId: string, isPublic: boolean) {
+    return await db.project.update({
+        where: {
+            id: projectId,
+            userId, // Ensure owner
+        },
+        data: {
+            isPublic,
         },
     });
 }
