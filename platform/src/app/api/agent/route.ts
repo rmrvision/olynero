@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server';
 import { Agent } from '@/lib/agent/core';
+import { AgentRequestSchema } from '@/lib/validators';
 
 export async function POST(req: Request) {
     try {
-        const { prompt } = await req.json();
+        const body = await req.json();
+        const validation = AgentRequestSchema.safeParse(body);
 
-        if (!prompt) {
-            return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
+        if (!validation.success) {
+            return NextResponse.json({ error: validation.error.errors[0].message }, { status: 400 });
         }
+
+        const { prompt } = validation.data;
 
         console.log(`[API] Starting agent with prompt: ${prompt}`);
 

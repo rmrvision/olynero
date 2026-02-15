@@ -14,51 +14,49 @@ const Preview = dynamic(() => import('@/components/preview/preview-panel').then(
   loading: () => <div className="flex items-center justify-center h-full text-muted-foreground">Initializing Environment...</div>
 });
 
+import { useMutation } from "@tanstack/react-query";
+
 export default function Home() {
   const [prompt, setPrompt] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
   const [code, setCode] = useState("// Generated code will appear here...");
   const [generatedFiles, setGeneratedFiles] = useState<any[]>([]);
 
-  const handleGenerate = async () => {
-    if (!prompt) return;
-
-    setIsGenerating(true);
-    setCode("// Olynero AI is thinking...");
-
-    try {
+  const mutation = useMutation({
+    mutationFn: async (userPrompt: string) => {
       const response = await fetch('/api/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ prompt: userPrompt })
       });
-
       const data = await response.json();
-
-      if (data.status === 'success') {
-        toast.success("Mission Accomplished!");
-
-        // Update files for preview
-        if (data.artifacts) {
-          setGeneratedFiles(data.artifacts);
-        }
-
-        const indexFile = data.artifacts?.find((f: any) => f.path.includes('index') || f.path.includes('App') || f.path.includes('page'));
-        if (indexFile) {
-          setCode(indexFile.content);
-        } else {
-          setCode("// Mission completed. Check preview.");
-        }
-      } else {
-        toast.error("Agent failed: " + data.error);
-        setCode("// Error: " + data.error);
+      if (!response.ok) throw new Error(data.error || 'Failed to generate');
+      return data;
+    },
+    onSuccess: (data) => {
+      toast.success("Mission Accomplished!");
+      if (data.artifacts) {
+        setGeneratedFiles(data.artifacts);
       }
-    } catch (e: any) {
-      toast.error("Network error: " + e.message);
-    } finally {
-      setIsGenerating(false);
+      const indexFile = data.artifacts?.find((f: any) => f.path.includes('index') || f.path.includes('App') || f.path.includes('page'));
+      if (indexFile) {
+        setCode(indexFile.content);
+      } else {
+        setCode("// Mission completed. Check preview.");
+      }
+    },
+    onError: (error) => {
+      toast.error("Agent failed: " + error.message);
+      setCode("// Error: " + error.message);
     }
+  });
+
+  const handleGenerate = () => {
+    if (!prompt) return;
+    setCode("// Olynero AI is thinking...");
+    mutation.mutate(prompt);
   };
+
+  const isGenerating = mutation.isPending;
 
   return (
     <div className="flex h-screen w-full bg-background text-foreground">
