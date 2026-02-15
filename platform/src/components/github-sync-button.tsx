@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Github, Loader2, GitCommit } from "lucide-react";
+import { Github, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -26,15 +26,14 @@ export function GitHubSyncButton({ projectId, githubRepo }: GitHubSyncButtonProp
                 const text = await response.text();
                 // Check if it's an auth issue
                 if (response.status === 400 && text.includes("account")) {
-                    toast.error("Please sign in with GitHub to sync projects");
-                    // Optional: Redirect to login or show link instructions
+                    toast.error("Пожалуйста, войдите через GitHub");
                     return;
                 }
-                throw new Error(text || "Failed to sync");
+                throw new Error(text || "Ошибка синхронизации");
             }
 
             const data = await response.json();
-            toast.success(`Synced to ${data.repoName}`);
+            toast.success(`Синхронизировано с ${data.repoName}`);
             router.refresh();
         } catch (error: any) {
             console.error(error);
@@ -53,7 +52,8 @@ export function GitHubSyncButton({ projectId, githubRepo }: GitHubSyncButtonProp
             disabled={isLoading}
         >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Github className="w-4 h-4" />}
-            {githubRepo ? "Push Changes" : "Connect GitHub"}
+            {githubRepo ? "Отправить изменения" : "Подключить GitHub"}
         </Button>
     );
 }
+

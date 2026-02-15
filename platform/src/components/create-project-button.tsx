@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createProjectAction } from "@/actions/project-actions"; // We need to create this
+import { createProjectAction } from "@/actions/project-actions";
 
 export function CreateProjectButton() {
     const [open, setOpen] = useState(false);
@@ -24,6 +24,7 @@ export function CreateProjectButton() {
     const router = useRouter();
 
     const handleCreate = async () => {
+        if (!name.trim()) return;
         setIsLoading(true);
         try {
             const result = await createProjectAction(name);
@@ -41,38 +42,44 @@ export function CreateProjectButton() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button>
+                <Button className="bg-white text-black hover:bg-neutral-200">
                     <Plus className="size-4 mr-2" />
                     Новый проект
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 text-white">
                 <DialogHeader>
                     <DialogTitle>Создать проект</DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-neutral-400">
                         Дайте имя вашему новому приложению.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-right">
+                    <div className="space-y-2">
+                        <Label htmlFor="name" className="text-sm font-medium text-white">
                             Название
                         </Label>
                         <Input
                             id="name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="col-span-3"
-                            placeholder="My Awesome App"
+                            className="bg-black/40 border-white/10 text-white placeholder:text-neutral-600 focus-visible:ring-indigo-500/50"
+                            placeholder="Например: Мой супер стартап"
+                            autoComplete="off"
                         />
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit" onClick={handleCreate} disabled={!name || isLoading}>
-                        {isLoading ? "Создание..." : "Создать"}
+                    <Button
+                        onClick={handleCreate}
+                        disabled={!name.trim() || isLoading}
+                        className="w-full bg-indigo-600 hover:bg-indigo-500 text-white"
+                    >
+                        {isLoading ? "Создание..." : "Создать проект"}
                     </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     );
 }
+

@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from "react";
 import { FileTree, FileNode } from "@/components/file-tree";
 import { CodeEditor as Editor } from "@/components/code-editor";
 import { buildFileTree } from "@/lib/file-utils";
-import { useWebContainer } from "@/hooks/use-webcontainer"; // NEW
+import { useWebContainer } from "@/hooks/use-webcontainer";
 import { useDebouncedCallback } from "use-debounce";
 import { saveFileAction, deleteFileAction } from "@/actions/file-actions";
 import { toast } from "sonner";
@@ -20,6 +20,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShareDialog } from "@/components/share-dialog";
 import { GitHubSyncButton } from "@/components/github-sync-button";
+import { DeployDialog } from "@/components/deploy-dialog";
 
 const getLanguageFromPath = (path: string) => {
     if (path.endsWith(".tsx") || path.endsWith(".ts")) return "typescript";
@@ -31,7 +32,7 @@ const getLanguageFromPath = (path: string) => {
 };
 
 interface ProjectClientPageProps {
-    project: any; // Type this properly later
+    project: any;
     files: any[];
     isReadOnly?: boolean;
 }
@@ -42,11 +43,8 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
     const fileTree = buildFileTree(fileList);
 
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
-    const [fileContent, setFileContent] = useState<string>("// Select a file to edit");
+    const [fileContent, setFileContent] = useState<string>("// Выберите файл для редактирования");
 
-    // Boot WebContainer (Only if NOT read-only, or maybe allow read-only execution? strictly safer to disable for now to save resources)
-    // Actually, allowing preview in read-only is cool. Let's keep it but disable interactions if possible? 
-    // For now, let's boot it so they can see the app running!
     const { instance, loading: bootLoading, error: bootError, serverUrl, terminalLogs } = useWebContainer({ files });
 
     const connected = !!instance && !bootLoading;
@@ -77,23 +75,21 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
         } catch (error) {
             console.error("Failed to save file:", error);
             setIsSaving(false);
-            toast.error("Failed to save changes");
+            toast.error("Ошибка сохранения");
         }
     }, 1000);
 
     const handleEditorChange = (value: string | undefined) => {
         if (value === undefined || !selectedFile) return;
 
-        // 1. Update local state (Allow typing even in read-only for playground feel, but don't save?)
-        // Better: Make editor read-only if isReadOnly
         setFileContent(value);
 
         if (isReadOnly) return;
 
-        // Update fileList to keep tree in sync (optional but good for consistency)
+        // Update fileList to keep tree in sync
         setFileList(prev => prev.map(f => f.path === selectedFile ? { ...f, content: value } : f));
 
-        // 2. Update WebContainer (Immediate)
+        // Update WebContainer
         if (instance) {
             const cleanPath = selectedFile.startsWith('/') ? selectedFile.slice(1) : selectedFile;
             instance.fs.writeFile(cleanPath, value).catch((err: any) => {
@@ -101,7 +97,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
             });
         }
 
-        // 3. Queue Save to DB
+        // Queue Save to DB
         setIsSaving(true);
         debouncedSave(project.id, selectedFile, value);
     };
@@ -109,7 +105,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
     // --- Agent Tools Handlers ---
 
     const handleFileUpdate = async (path: string, content: string) => {
-        if (isReadOnly) { toast.error("Read-only mode"); return; }
+        if (isReadOnly) { toast.error("Режим только для чтения"); return; }
         // 1. Write to WebContainer
         if (instance) {
             const cleanPath = path.startsWith('/') ? path.slice(1) : path;
@@ -136,18 +132,16 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
         if (selectedFile === path) {
             setFileContent(content);
         }
-
-        // Force refresh tree (handled by fileList change)
     };
 
     const handleFileCreate = async (path: string, content: string) => {
-        if (isReadOnly) { toast.error("Read-only mode"); return; }
+        if (isReadOnly) { toast.error("Режим только для чтения"); return; }
         await handleFileUpdate(path, content);
-        toast.success(`Created ${path}`);
+        toast.success(`Создан файл ${path}`);
     };
 
     const handleFileDelete = async (path: string) => {
-        if (isReadOnly) { toast.error("Read-only mode"); return; }
+        if (isReadOnly) { toast.error("Режим только для чтения"); return; }
         // 1. Remove from WebContainer
         if (instance) {
             const cleanPath = path.startsWith('/') ? path.slice(1) : path;
@@ -167,34 +161,31 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
         // 4. Clear Editor if active
         if (selectedFile === path) {
             setSelectedFile(null);
-            setFileContent("// Select a file to edit");
+            setFileContent("// Выберите файл для редактирования");
         }
     };
 
     const handleRunCommand = async (command: string) => {
-        if (isReadOnly) { toast.error("Read-only mode"); return; }
+        if (isReadOnly) { toast.error("Режим только для чтения"); return; }
         if (!instance) {
-            toast.error("Environment not ready");
+            toast.error("Окружение не готово");
             return;
         }
 
-        // Simply spawn 'jsh' (shell) to execute the command string
-        // This handles args parsing automatically
         try {
             const process = await instance.spawn('jsh', ['-c', command]);
 
             process.output.pipeTo(new WritableStream({
                 write(data) {
                     console.log(`[${command}]`, data);
-                    // Could stream to a terminal or toast, for now console + simple toast
                 }
             }));
 
             await process.exit;
-            toast.success(`Executed: ${command}`);
+            toast.success(`Выполнено: ${command}`);
         } catch (e) {
             console.error("Command failed", e);
-            toast.error("Command failed execution");
+            toast.error("Ошибка выполнения команды");
         }
     };
 
@@ -213,7 +204,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                         <span className="font-semibold text-sm">{project.name}</span>
                         {isReadOnly && (
                             <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] uppercase font-bold tracking-wider">
-                                View Only
+                                Только чтение
                             </span>
                         )}
                     </div>
@@ -222,13 +213,14 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/5">
                         <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
                         <span className="text-xs text-neutral-400 font-medium">
-                            {connected ? 'Connected' : 'Disconnected'}
+                            {connected ? 'Подключено' : 'Отключено'}
                         </span>
                     </div>
                     {/* Share Dialog */}
                     {!isReadOnly && (
                         <>
                             <GitHubSyncButton projectId={project.id} githubRepo={project.githubRepo} />
+                            <DeployDialog project={project} />
                             <ShareDialog project={project} userId={project.userId} />
                         </>
                     )}
@@ -241,7 +233,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                     {/* LEFT: File Explorer */}
                     <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="bg-black/20 backdrop-blur-sm flex flex-col border-r border-white/5">
                         <div className="p-3 border-b border-white/5 flex items-center justify-between bg-white/5">
-                            <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Explorer</span>
+                            <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Файлы</span>
                         </div>
                         <div className="flex-1 overflow-y-auto p-2">
                             {bootLoading ? (
@@ -272,7 +264,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                                     {selectedFile}
                                 </div>
                             ) : (
-                                <div className="px-4 py-2 text-xs text-neutral-500 italic">No file selected</div>
+                                <div className="px-4 py-2 text-xs text-neutral-500 italic">Файл не выбран</div>
                             )}
                         </div>
                         <div className="flex-1 relative">
@@ -288,11 +280,9 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                             <div className="flex items-center gap-3">
                                 <span>main*</span>
                                 <span className="opacity-50">|</span>
-                                <span>{isSaving ? "Saving..." : "Saved"}</span>
+                                <span>{isSaving ? "Сохранение..." : "Сохранено"}</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <span>TypeScript React</span>
-                                <span className="opacity-50">|</span>
                                 <span>UTF-8</span>
                             </div>
                         </div>
@@ -306,7 +296,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                             {/* Preview */}
                             <div className="h-1/2 border-b border-white/5 flex flex-col">
                                 <div className="h-9 border-b border-white/5 flex items-center justify-between px-3 bg-white/5">
-                                    <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Preview</span>
+                                    <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Предпросмотр</span>
                                     {serverUrl && (
                                         <a href={serverUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-400 hover:underline truncate max-w-[200px]">
                                             {serverUrl}
@@ -322,14 +312,14 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                                     {bootLoading && (
                                         <div className="absolute inset-0 bg-zinc-900/90 backdrop-blur flex flex-col items-center justify-center text-center p-4">
                                             <div className="w-12 h-12 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
-                                            <p className="text-indigo-300 font-medium">Booting Dev Environment...</p>
-                                            <p className="text-neutral-500 text-xs mt-2">Installing dependencies & starting server</p>
+                                            <p className="text-indigo-300 font-medium">Запуск окружения...</p>
+                                            <p className="text-neutral-500 text-xs mt-2">Установка пакетов и старт сервера</p>
                                         </div>
                                     )}
                                     {bootError && (
                                         <div className="absolute inset-0 bg-red-950/90 backdrop-blur flex items-center justify-center p-6 text-center">
                                             <div>
-                                                <p className="text-red-400 font-medium mb-2">Boot Failed</p>
+                                                <p className="text-red-400 font-medium mb-2">Ошибка запуска</p>
                                                 <p className="text-red-300/70 text-sm">{bootError}</p>
                                             </div>
                                         </div>
@@ -341,12 +331,12 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                             <div className="h-1/2 flex flex-col bg-zinc-900/30">
                                 <div className="h-9 border-b border-white/5 flex items-center px-3 bg-white/5">
                                     <Sparkles className="w-3 h-3 text-purple-400 mr-2" />
-                                    <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">AI Assistant</span>
+                                    <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">AI Ассистент</span>
                                 </div>
                                 <div className="flex-1 overflow-hidden relative">
                                     {isReadOnly ? (
                                         <div className="flex items-center justify-center h-full text-neutral-500 text-sm">
-                                            AI Assistant unavailable in View Only mode
+                                            AI Ассистент недоступен в режиме чтения
                                         </div>
                                     ) : (
                                         <AgentChat

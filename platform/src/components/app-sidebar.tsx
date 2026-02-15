@@ -1,6 +1,6 @@
 "use client"
 
-import { Calendar, Home, Inbox, MessageSquare, Plus, Search, Settings } from "lucide-react"
+import { Home, Layers, Terminal, Settings, ChevronUp, User2, LayoutDashboard } from "lucide-react"
 
 import {
     Sidebar,
@@ -14,65 +14,91 @@ import {
     SidebarFooter,
     SidebarHeader,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-
-// Menu items.
-const items = [
-    {
-        title: "Проект Альфа",
-        url: "#",
-        icon: MessageSquare,
-    },
-    {
-        title: "Маркетинг Копия",
-        url: "#",
-        icon: MessageSquare,
-    },
-    {
-        title: "React Компонент",
-        url: "#",
-        icon: MessageSquare,
-    },
-]
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { useSession, signOut } from "next-auth/react"
 
 export function AppSidebar() {
+    const { data: session } = useSession();
+
     return (
-        <Sidebar>
-            <SidebarHeader>
-                <div className="flex items-center gap-2 px-2 py-1">
-                    <div className="size-6 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold">O</div>
-                    <span className="font-bold text-lg">Olynero</span>
+        <Sidebar className="border-r border-white/5 bg-zinc-950/50 backdrop-blur-xl">
+            <SidebarHeader className="border-b border-white/5 p-4">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400">
+                        <Terminal className="h-5 w-5" />
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-white">Olynero AI</span>
+                        <span className="text-xs text-neutral-500">v1.2.0 Enterprise</span>
+                    </div>
                 </div>
+            </SidebarHeader>
+            <SidebarContent className="px-2 py-4">
                 <SidebarGroup>
-                    <SidebarGroupLabel>Меню</SidebarGroupLabel>
+                    <SidebarGroupLabel className="text-xs font-medium uppercase text-neutral-500">Платформа</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <a href="/">
-                                        <Home />
-                                        <span>Проекты</span>
+                                <SidebarMenuButton asChild className="text-neutral-400 hover:bg-white/5 hover:text-white data-[active=true]:bg-white/5 data-[active=true]:text-white">
+                                    <a href="/dashboard">
+                                        <LayoutDashboard className="h-4 w-4" />
+                                        <span>Дашборд</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild className="text-neutral-400 hover:bg-white/5 hover:text-white">
+                                    <a href="/projects">
+                                        <Layers className="h-4 w-4" />
+                                        <span>Мои Проекты</span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
-            </SidebarHeader>
-            <SidebarContent>
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="border-t border-white/5 p-4">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <a href="/settings">
-                                <Settings />
-                                <span className="text-sm">Настройки</span>
-                            </a>
-                        </SidebarMenuButton>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <SidebarMenuButton className="h-12 w-full justify-start gap-3 rounded-xl border border-white/5 bg-white/5 px-3 hover:bg-white/10">
+                                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white">
+                                        {session?.user?.image ? (
+                                            <img src={session.user.image} alt="User" className="h-full w-full rounded-full object-cover" />
+                                        ) : (
+                                            <User2 className="h-4 w-4" />
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col items-start gap-0.5 overflow-hidden text-left">
+                                        <span className="text-sm font-medium text-white truncate w-full">{session?.user?.name || "Пользователь"}</span>
+                                        <span className="text-xs text-neutral-500 truncate w-full">{session?.user?.email || "user@olynero.ai"}</span>
+                                    </div>
+                                    <ChevronUp className="ml-auto h-4 w-4 text-neutral-500" />
+                                </SidebarMenuButton>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                side="top"
+                                className="w-[--radix-popper-anchor-width] min-w-56 bg-zinc-950 border-white/10 text-white"
+                            >
+                                <DropdownMenuItem className="focus:bg-white/5 focus:text-white">
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    <span>Настройки</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="text-red-400 focus:bg-red-500/10 focus:text-red-400"
+                                    onClick={() => signOut({ callbackUrl: "/login" })}
+                                >
+                                    <span>Выйти</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
         </Sidebar>
     )
 }
+
+
