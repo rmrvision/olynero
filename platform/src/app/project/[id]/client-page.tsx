@@ -19,6 +19,7 @@ import { AgentChat } from "@/components/agent-chat";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShareDialog } from "@/components/share-dialog";
+import { GitHubSyncButton } from "@/components/github-sync-button";
 
 const getLanguageFromPath = (path: string) => {
     if (path.endsWith(".tsx") || path.endsWith(".ts")) return "typescript";
@@ -226,7 +227,10 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                     </div>
                     {/* Share Dialog */}
                     {!isReadOnly && (
-                        <ShareDialog project={project} userId={project.userId} />
+                        <>
+                            <GitHubSyncButton projectId={project.id} githubRepo={project.githubRepo} />
+                            <ShareDialog project={project} userId={project.userId} />
+                        </>
                     )}
                 </div>
             </header>

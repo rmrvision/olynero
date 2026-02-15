@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth';
 import { authConfig } from './auth.config';
 import Credentials from 'next-auth/providers/credentials';
+import GitHub from 'next-auth/providers/github';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
@@ -27,6 +28,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 console.log('Invalid credentials');
                 return null;
+            },
+        }),
+        GitHub({
+            clientId: process.env.GITHUB_ID,
+            clientSecret: process.env.GITHUB_SECRET,
+            authorization: {
+                params: {
+                    scope: 'read:user user:email repo',
+                },
             },
         }),
     ],

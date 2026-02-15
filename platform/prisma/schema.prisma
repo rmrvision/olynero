@@ -78,6 +78,7 @@ model Project {
   updatedAt   DateTime @updatedAt
   
   isPublic    Boolean  @default(false)
+  githubRepo  String?  // e.g. "username/repo-name"
 
   files       File[]
   messages    Message[]
