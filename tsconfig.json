@@ -8,5 +8,9 @@
         "skipLibCheck": true,
         "outDir": "./dist",
         "rootDir": "./src"
-    }
+    },
+    "exclude": [
+        "platform",
+        "node_modules"
+    ]
 }
