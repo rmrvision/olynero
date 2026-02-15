@@ -14,20 +14,30 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
+import { login } from "@/actions/auth-actions"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false)
+    const router = useRouter()
 
-    async function onSubmit(event: React.FormEvent) {
+    async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
         setIsLoading(true)
 
-        // Simulate login delay
-        setTimeout(() => {
-            setIsLoading(false)
-            toast.success("Вы успешно вошли!")
-            // In a real app, redirection happens here
-        }, 1000)
+        const formData = new FormData(event.currentTarget)
+        const result = await login(formData)
+
+        setIsLoading(false)
+
+        if (result?.error) {
+            toast.error(result.error)
+        } else {
+            // Redirect is handled by the server action usually, but if we get here without error
+            // it means success (though signIn usually redirects)
+            toast.success("Вход выполнен!")
+            // router.push("/chat") // Redirect handled by NextAuth
+        }
     }
 
     return (
@@ -42,11 +52,11 @@ export default function LoginPage() {
                 <CardContent className="grid gap-4">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" placeholder="m@example.com" required />
+                        <Input name="email" id="email" type="email" placeholder="m@example.com" required />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="password">Пароль</Label>
-                        <Input id="password" type="password" required />
+                        <Input name="password" id="password" type="password" required />
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
@@ -64,3 +74,4 @@ export default function LoginPage() {
         </Card>
     )
 }
+

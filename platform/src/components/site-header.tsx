@@ -7,6 +7,16 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+// import { User } from "next-auth" // Importing from next-auth in client component might be tricky if not careful with types, better to use any or define simple shape
+// Actually User type is safe.
+
+interface SiteHeaderProps {
+    user?: {
+        name?: string | null
+        email?: string | null
+        image?: string | null
+    } | null
+}
 
 const navigation = [
     { name: "Функции", href: "/#features" },
@@ -16,7 +26,7 @@ const navigation = [
     { name: "О нас", href: "/about" },
 ]
 
-export function SiteHeader() {
+export function SiteHeader({ user }: SiteHeaderProps) {
     const pathname = usePathname()
     const [isOpen, setIsOpen] = useState(false)
 
@@ -88,15 +98,24 @@ export function SiteHeader() {
                         {/* Search or other items */}
                     </div>
                     <nav className="flex items-center space-x-2">
-                        <Link href="/login">
-                            <Button variant="ghost" className="text-white hover:text-white/80 hover:bg-white/10">Войти</Button>
-                        </Link>
-                        <Link href="/register">
-                            <Button className="bg-white text-black hover:bg-white/90">Начать</Button>
-                        </Link>
+                        {user ? (
+                            <Link href="/chat">
+                                <Button className="bg-white text-black hover:bg-white/90">К консоли</Button>
+                            </Link>
+                        ) : (
+                            <>
+                                <Link href="/login">
+                                    <Button variant="ghost" className="text-white hover:text-white/80 hover:bg-white/10">Войти</Button>
+                                </Link>
+                                <Link href="/register">
+                                    <Button className="bg-white text-black hover:bg-white/90">Начать</Button>
+                                </Link>
+                            </>
+                        )}
                     </nav>
                 </div>
             </div>
         </header>
     )
 }
+

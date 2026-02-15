@@ -14,19 +14,28 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
+import { register } from "@/actions/auth-actions"
+import { useRouter } from "next/navigation"
 
 export default function RegisterPage() {
     const [isLoading, setIsLoading] = useState(false)
+    const router = useRouter()
 
-    async function onSubmit(event: React.FormEvent) {
+    async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
         setIsLoading(true)
 
-        // Simulate registration delay
-        setTimeout(() => {
-            setIsLoading(false)
-            toast.success("Аккаунт успешно создан!")
-        }, 1000)
+        const formData = new FormData(event.currentTarget)
+        const result = await register(formData)
+
+        setIsLoading(false)
+
+        if (result?.error) {
+            toast.error(result.error)
+        } else {
+            toast.success("Аккаунт успешно создан! Теперь войдите.")
+            router.push("/login")
+        }
     }
 
     return (
@@ -41,15 +50,15 @@ export default function RegisterPage() {
                 <CardContent className="grid gap-4">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Полное имя</Label>
-                        <Input id="name" placeholder="Иван Иванов" required />
+                        <Input name="name" id="name" placeholder="Иван Иванов" required />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" placeholder="m@example.com" required />
+                        <Input name="email" id="email" type="email" placeholder="m@example.com" required />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="password">Пароль</Label>
-                        <Input id="password" type="password" required />
+                        <Input name="password" id="password" type="password" required />
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
@@ -67,3 +76,4 @@ export default function RegisterPage() {
         </Card>
     )
 }
+
