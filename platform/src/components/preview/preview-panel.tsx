@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { getWebContainer } from '@/lib/webcontainer';
+import { getWebContainerInstance } from '@/lib/webcontainer';
 import { TerminalView } from './terminal';
 import { Terminal } from 'xterm';
 import { WebContainer } from '@webcontainer/api';
@@ -29,12 +29,12 @@ export const Preview: React.FC<PreviewProps> = ({ files }) => {
                 const terminal = terminalRef.current;
                 terminal?.writeln('\x1b[33m[System] Booting WebContainer...\x1b[0m');
 
-                const webcontainer = await getWebContainer();
+                const webcontainer = await getWebContainerInstance();
                 webContainerRef.current = webcontainer;
 
-                webcontainer.on('server-ready', (port, url) => {
-                    terminal?.writeln(`\x1b[32m[System] Server ready at ${url}\x1b[0m`);
-                    setUrl(url);
+                webcontainer.on('server-ready', (port: number, url: string) => {
+                    terminal?.writeln(`\x1b[32m[System] Server ready on port ${port}: ${url}\x1b[0m`);
+                    setUrl(url); // Fixed: was setIframeUrl
                     setIsLoading(false);
                 });
 
@@ -49,8 +49,8 @@ export const Preview: React.FC<PreviewProps> = ({ files }) => {
                 await startDevServer();
 
             } catch (error) {
-                console.error("Failed to boot WebContainer", error);
-                terminalRef.current?.writeln(`\x1b[31m[Error] Failed to boot: ${error}\x1b[0m`);
+                console.error('Failed to boot WebContainer:', error);
+                terminalRef.current?.writeln('\x1b[31m[System] Failed to boot WebContainer\x1b[0m');
             }
         };
 
@@ -224,7 +224,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
             {/* Terminal Panel */}
             <div className="h-48 border-t border-slate-700 bg-black p-2">
-                <TerminalView onMount={(term) => { terminalRef.current = term; }} />
+                <TerminalView onTerminalReady={(term) => { terminalRef.current = term; }} />
             </div>
         </div>
     );
