@@ -17,20 +17,26 @@ const LoginSchema = z.object({
     password: z.string().min(1, 'Password is required'),
 });
 
-export async function register(formData: FormData) {
-    console.log("[Auth Action] Register called");
-    const rawData = {
-        name: formData.get('name'),
-        email: formData.get('email'),
-        password: formData.get('password'),
-    };
-    console.log("[Auth Action] Raw data received:", { ...rawData, password: '***' });
+type RegisterInput = FormData | { name: string; email: string; password: string };
 
+function getRegisterPayload(input: RegisterInput) {
+    if (input instanceof FormData) {
+        return {
+            name: input.get('name'),
+            email: input.get('email'),
+            password: input.get('password'),
+        }
+    }
+    return input
+}
+
+export async function register(input: RegisterInput) {
+    const rawData = getRegisterPayload(input)
     const validatedFields = RegisterSchema.safeParse(rawData);
 
     if (!validatedFields.success) {
-        console.error("[Auth Action] Validation failed:", validatedFields.error);
-        return { error: 'Invalid fields' };
+        const msg = validatedFields.error.flatten().formErrors[0] || validatedFields.error.errors[0]?.message;
+        return { error: msg || 'Проверьте поля: имя, email и пароль (не менее 6 символов).' };
     }
 
     try {

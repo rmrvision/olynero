@@ -24,13 +24,13 @@ export default function RegisterPage() {
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
         setIsLoading(true)
-        console.log("Form submitted");
-
         try {
-            const formData = new FormData(event.currentTarget)
-            console.log("Calling register action...");
-            const result = await register(formData)
-            console.log("Register action result:", result);
+            const form = event.currentTarget
+            const result = await register({
+                name: (form.elements.namedItem("name") as HTMLInputElement).value,
+                email: (form.elements.namedItem("email") as HTMLInputElement).value,
+                password: (form.elements.namedItem("password") as HTMLInputElement).value,
+            })
 
             if (result?.error) {
                 toast.error(result.error)
@@ -39,7 +39,7 @@ export default function RegisterPage() {
                 router.push("/login")
             }
         } catch (error) {
-            console.error("Client side error:", error);
+            console.error("Client side error:", error)
             toast.error("Произошла ошибка. Попробуйте еще раз.")
         } finally {
             setIsLoading(false)
@@ -70,7 +70,7 @@ export default function RegisterPage() {
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
-                    <Button className="w-full" disabled={isLoading}>
+                    <Button type="submit" className="w-full" disabled={isLoading}>
                         {isLoading ? "Создание аккаунта..." : "Создать аккаунт"}
                     </Button>
                     <div className="text-center text-sm text-muted-foreground">
