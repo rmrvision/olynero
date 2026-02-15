@@ -24,10 +24,13 @@ export default function RegisterPage() {
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
         setIsLoading(true)
+        console.log("Form submitted");
 
         try {
             const formData = new FormData(event.currentTarget)
+            console.log("Calling register action...");
             const result = await register(formData)
+            console.log("Register action result:", result);
 
             if (result?.error) {
                 toast.error(result.error)
@@ -36,6 +39,7 @@ export default function RegisterPage() {
                 router.push("/login")
             }
         } catch (error) {
+            console.error("Client side error:", error);
             toast.error("Произошла ошибка. Попробуйте еще раз.")
         } finally {
             setIsLoading(false)
