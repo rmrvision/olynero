@@ -4,12 +4,10 @@ import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import { PrismaAdapter } from '@auth/prisma-adapter';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
-    adapter: PrismaAdapter(db),
-    session: { strategy: 'jwt' },
+    session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 },
     providers: [
         Credentials({
             async authorize(credentials) {
@@ -32,4 +30,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
         }),
     ],
+    callbacks: {
+        ...authConfig.callbacks,
+        jwt({ token, user }) {
+            if (user) {
+                token.id = user.id;
+                token.email = user.email;
+                token.name = user.name;
+            }
+            return token;
+        },
+        session({ session, token }) {
+            if (session.user && token.id) {
+                session.user.id = token.id;
+                session.user.email = token.email ?? undefined;
+                session.user.name = token.name ?? undefined;
+            }
+            return session;
+        },
+    },
 });
