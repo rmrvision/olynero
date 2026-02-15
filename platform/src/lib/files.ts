@@ -73,3 +73,13 @@ export async function deleteFile(fileId: string) {
         },
     });
 }
+
+export async function deleteFileByPath(projectId: string, path: string) {
+    const file = await db.file.findFirst({
+        where: { projectId, path }
+    });
+    if (file) {
+        return await db.file.delete({ where: { id: file.id } });
+    }
+    return null;
+}

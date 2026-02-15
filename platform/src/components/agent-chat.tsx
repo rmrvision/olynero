@@ -12,9 +12,11 @@ interface AgentChatProps {
     projectId: string;
     onUpdateFile: (path: string, content: string) => void;
     onCreateFile: (path: string, content: string) => void;
+    onDeleteFile: (path: string) => void;
+    onRunCommand: (command: string) => void;
 }
 
-export function AgentChat({ projectId, onUpdateFile, onCreateFile }: AgentChatProps) {
+export function AgentChat({ projectId, onUpdateFile, onCreateFile, onDeleteFile, onRunCommand }: AgentChatProps) {
     const [input, setInput] = useState("");
     const { messages, sendMessage, status } = useChat({
         api: "/api/agent",
@@ -33,6 +35,16 @@ export function AgentChat({ projectId, onUpdateFile, onCreateFile }: AgentChatPr
                 const { path, content } = toolCall.args as { path: string, content: string };
                 toast.info(`Creating ${path}...`);
                 onCreateFile(path, content);
+            }
+            if (toolCall.toolName === 'deleteFile') {
+                const { path } = toolCall.args as { path: string };
+                toast.info(`Deleting ${path}...`);
+                onDeleteFile(path);
+            }
+            if (toolCall.toolName === 'runCommand') {
+                const { command } = toolCall.args as { command: string };
+                toast.info(`Running ${command}...`);
+                onRunCommand(command);
             }
         },
     } as any);

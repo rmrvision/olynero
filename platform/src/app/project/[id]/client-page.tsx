@@ -11,7 +11,7 @@ import { CodeEditor } from "@/components/code-editor";
 import { buildFileTree } from "@/lib/file-utils";
 import { useWebContainer } from "@/hooks/use-webcontainer"; // NEW
 import { useDebouncedCallback } from "use-debounce";
-import { saveFileAction } from "@/actions/file-actions";
+import { saveFileAction, deleteFileAction } from "@/actions/file-actions";
 import { toast } from "sonner";
 import { Loader2, Check } from "lucide-react";
 import { Preview as PreviewPanel } from "@/components/preview/preview-panel";
@@ -23,27 +23,23 @@ interface ProjectClientPageProps {
 }
 
 export default function ProjectClientPage({ project, files }: ProjectClientPageProps) {
+    const [fileList, setFileList] = useState(files);
     // Convert flat files to tree
-    const fileTree = buildFileTree(files);
+    const fileTree = buildFileTree(fileList);
 
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
     const [fileContent, setFileContent] = useState<string>("// Select a file to edit");
 
     // Boot WebContainer
-    // Boot WebContainer
     const { instance, loading: bootLoading, error: bootError, serverUrl } = useWebContainer({ files });
 
     const handleFileSelect = (path: string) => {
-        const file = files.find(f => f.path === path);
+        const file = fileList.find(f => f.path === path);
         if (file) {
             setSelectedFile(path);
             setFileContent(file.content);
         }
     };
-
-
-
-    // ... inside component
 
     const [isSaving, setIsSaving] = useState(false);
 
@@ -66,6 +62,9 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
         // 1. Update local state
         setFileContent(value);
 
+        // Update fileList to keep tree in sync (optional but good for consistency)
+        setFileList(prev => prev.map(f => f.path === selectedFile ? { ...f, content: value } : f));
+
         // 2. Update WebContainer (Immediate)
         if (instance) {
             const cleanPath = selectedFile.startsWith('/') ? selectedFile.slice(1) : selectedFile;
@@ -77,6 +76,94 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
         // 3. Queue Save to DB
         setIsSaving(true);
         debouncedSave(project.id, selectedFile, value);
+    };
+
+    // --- Agent Tools Handlers ---
+
+    const handleFileUpdate = async (path: string, content: string) => {
+        // 1. Write to WebContainer
+        if (instance) {
+            const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+            try {
+                await instance.fs.writeFile(cleanPath, content);
+            } catch (e) {
+                console.error("WC Write Error", e);
+            }
+        }
+
+        // 2. Save to DB
+        await saveFileAction(project.id, path, content);
+
+        // 3. Update State
+        setFileList(prev => {
+            const exists = prev.find(f => f.path === path);
+            if (exists) {
+                return prev.map(f => f.path === path ? { ...f, content } : f);
+            }
+            return [...prev, { path, content }];
+        });
+
+        // 4. Update Editor if active
+        if (selectedFile === path) {
+            setFileContent(content);
+        }
+
+        // Force refresh tree (handled by fileList change)
+    };
+
+    const handleFileCreate = async (path: string, content: string) => {
+        await handleFileUpdate(path, content);
+        toast.success(`Created ${path}`);
+    };
+
+    const handleFileDelete = async (path: string) => {
+        // 1. Remove from WebContainer
+        if (instance) {
+            const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+            try {
+                await instance.fs.rm(cleanPath);
+            } catch (e) {
+                console.error("WC Delete Error", e);
+            }
+        }
+
+        // 2. Remove from DB
+        await deleteFileAction(project.id, path);
+
+        // 3. Update State
+        setFileList(prev => prev.filter(f => f.path !== path));
+
+        // 4. Clear Editor if active
+        if (selectedFile === path) {
+            setSelectedFile(null);
+            setFileContent("// Select a file to edit");
+        }
+    };
+
+    const handleRunCommand = async (command: string) => {
+        if (!instance) {
+            toast.error("Environment not ready");
+            return;
+        }
+
+        // Simply spawn 'jsh' (shell) to execute the command string
+        // This handles args parsing automatically
+        try {
+            const process = await instance.spawn('jsh', ['-c', command]);
+
+            process.output.pipeTo(new WritableStream({
+                write(data) {
+                    console.log(`[${command}]`, data);
+                    // Could stream to a terminal or toast, for now console + simple toast
+                }
+            }));
+
+            await process.exit;
+            toast.success(`Executed: ${command}`);
+        } catch (e) {
+            console.error("Command failed", e);
+            toast.error("Command failed execution");
+        }
     };
 
     return (
@@ -147,17 +234,10 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
                             {/* Agent Chat */}
                             <AgentChat
                                 projectId={project.id}
-                                onUpdateFile={(path, content) => handleEditorChange(content)} // This overwrites current editor? Needs smarter logic.
-                                onCreateFile={(path, content) => {
-                                    // Create file in FS and DB
-                                    if (instance) {
-                                        instance.fs.writeFile(path, content);
-                                    }
-                                    saveFileAction(project.id, path, content);
-                                    // Force refresh file tree? 
-                                    // Ideally we update `files` prop or locally mutate `fileTree`.
-                                    toast.success(`Created ${path}`);
-                                }}
+                                onUpdateFile={handleFileUpdate}
+                                onCreateFile={handleFileCreate}
+                                onDeleteFile={handleFileDelete}
+                                onRunCommand={handleRunCommand}
                             />
                         </ResizablePanel>
                     </ResizablePanelGroup>

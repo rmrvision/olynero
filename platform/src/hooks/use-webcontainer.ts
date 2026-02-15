@@ -32,18 +32,25 @@ export function useWebContainer({ files }: UseWebContainerProps) {
 
                     const fileSystemTree: any = {};
 
-                    // Simple flat to tree conversion for now
-                    // TODO: Use a proper recursive builder if we support folders
                     files.forEach(file => {
-                        // sanitize path
-                        const cleanPath = file.path.startsWith('/') ? file.path.slice(1) : file.path;
-                        // For MVP, just mount at root. 
-                        // In reality we need to mkdir recursively.
-                        fileSystemTree[cleanPath] = {
-                            file: {
-                                contents: file.content
+                        const parts = file.path.split('/').filter(Boolean);
+                        let currentLevel: any = fileSystemTree;
+
+                        parts.forEach((part, index) => {
+                            const isFile = index === parts.length - 1;
+                            if (isFile) {
+                                currentLevel[part] = {
+                                    file: {
+                                        contents: file.content
+                                    }
+                                };
+                            } else {
+                                if (!currentLevel[part]) {
+                                    currentLevel[part] = { directory: {} };
+                                }
+                                currentLevel = currentLevel[part].directory;
                             }
-                        };
+                        });
                     });
 
                     console.log("Mounting files:", fileSystemTree);

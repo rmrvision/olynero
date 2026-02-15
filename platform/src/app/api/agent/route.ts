@@ -80,6 +80,24 @@ Environment:
                 execute: (async ({ path, content }: { path: string, content: string }) => {
                     return { message: `Created ${path}` };
                 }) as any
+            },
+            runCommand: {
+                description: "Run a shell command in the project environment.",
+                parameters: z.object({
+                    command: z.string().describe("The shell command to execute (e.g., 'npm install date-fns', 'ls -la')."),
+                }),
+                execute: (async ({ command }: { command: string }) => {
+                    return { message: `Executed command: ${command}` };
+                }) as any
+            },
+            deleteFile: {
+                description: "Delete a file from the project.",
+                parameters: z.object({
+                    path: z.string().describe("The file path to delete."),
+                }),
+                execute: (async ({ path }: { path: string }) => {
+                    return { message: `Deleted ${path}` };
+                }) as any
             }
         } as any,
     });
