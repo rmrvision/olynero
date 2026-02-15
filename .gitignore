@@ -1,0 +1,12 @@
+node_modules
+.DS_Store
+.env
+import_map.json
+deno.lock
+.vercel
+.next
+out
+build
+dist
+platform/.next
+platform/node_modules
