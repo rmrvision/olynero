@@ -25,16 +25,20 @@ export default function RegisterPage() {
         event.preventDefault()
         setIsLoading(true)
 
-        const formData = new FormData(event.currentTarget)
-        const result = await register(formData)
+        try {
+            const formData = new FormData(event.currentTarget)
+            const result = await register(formData)
 
-        setIsLoading(false)
-
-        if (result?.error) {
-            toast.error(result.error)
-        } else {
-            toast.success("Аккаунт успешно создан! Теперь войдите.")
-            router.push("/login")
+            if (result?.error) {
+                toast.error(result.error)
+            } else {
+                toast.success("Аккаунт успешно создан! Теперь войдите.")
+                router.push("/login")
+            }
+        } catch (error) {
+            toast.error("Произошла ошибка. Попробуйте еще раз.")
+        } finally {
+            setIsLoading(false)
         }
     }
 

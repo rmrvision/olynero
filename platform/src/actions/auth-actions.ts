@@ -28,28 +28,31 @@ export async function register(formData: FormData) {
         return { error: 'Invalid fields' };
     }
 
-    const { email, password, name } = validatedFields.data;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    try {
+        const { email, password, name } = validatedFields.data;
+        const hashedPassword = await bcrypt.hash(password, 10);
 
-    const existingUser = await db.user.findUnique({
-        where: { email },
-    });
+        const existingUser = await db.user.findUnique({
+            where: { email },
+        });
 
-    if (existingUser) {
-        return { error: 'Email already exists' };
+        if (existingUser) {
+            return { error: 'Email already exists' };
+        }
+
+        await db.user.create({
+            data: {
+                name,
+                email,
+                password: hashedPassword,
+            },
+        });
+
+        return { success: 'Account created!' };
+    } catch (error) {
+        console.error("Registration error:", error);
+        return { error: "Something went wrong during registration." };
     }
-
-    await db.user.create({
-        data: {
-            name,
-            email,
-            password: hashedPassword,
-        },
-    });
-
-    // Automatically sign in the user after registration (optional, but good UX)
-    // For now, we'll ask them to login.
-    return { success: 'Account created!' };
 }
 
 export async function login(formData: FormData) {
