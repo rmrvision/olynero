@@ -12,14 +12,23 @@ export const authConfig = {
             const isLoggedIn = !!auth?.user;
             const isOnChat = nextUrl.pathname.startsWith('/chat');
             const isOnSettings = nextUrl.pathname.startsWith('/settings');
+            const isOnAdmin = nextUrl.pathname.startsWith('/admin');
 
+            // Admin routes: require login + ADMIN role
+            if (isOnAdmin) {
+                if (!isLoggedIn) return false;
+                const role = (auth?.user as any)?.role;
+                if (role !== 'ADMIN') {
+                    return Response.redirect(new URL('/chat', nextUrl));
+                }
+                return true;
+            }
+
+            // Protected user routes
             if (isOnChat || isOnSettings) {
                 if (isLoggedIn) return true;
-                return false; // Redirect unauthenticated users to login page
+                return false;
             } else if (isLoggedIn) {
-                // Redirect logged-in users away from auth pages to chat
-                // However, we might want to let them browse marketing pages.
-                // Let's only redirect if they are on /login or /register
                 if (nextUrl.pathname.startsWith('/login') || nextUrl.pathname.startsWith('/register')) {
                     return Response.redirect(new URL('/chat', nextUrl));
                 }

@@ -35,7 +35,7 @@ export async function register(input: RegisterInput) {
     const validatedFields = RegisterSchema.safeParse(rawData);
 
     if (!validatedFields.success) {
-        const msg = validatedFields.error.flatten().formErrors[0] || validatedFields.error.errors[0]?.message;
+        const msg = validatedFields.error.flatten().formErrors[0] || validatedFields.error.issues[0]?.message;
         return { error: msg || 'Проверьте поля: имя, email и пароль (не менее 6 символов).' };
     }
 

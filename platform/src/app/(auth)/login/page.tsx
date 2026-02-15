@@ -1,14 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
@@ -33,45 +25,56 @@ export default function LoginPage() {
         if (result?.error) {
             toast.error(result.error)
         } else {
-            // Redirect is handled by the server action usually, but if we get here without error
-            // it means success (though signIn usually redirects)
             toast.success("Вход выполнен!")
-            // router.push("/chat") // Redirect handled by NextAuth
         }
     }
 
     return (
-        <Card className="w-full max-w-sm">
-            <CardHeader>
-                <CardTitle className="text-2xl">Вход</CardTitle>
-                <CardDescription>
+        <div>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold tracking-tight mb-2">С возвращением</h1>
+                <p className="text-neutral-400">
                     Введите ваш email для входа в аккаунт.
-                </CardDescription>
-            </CardHeader>
-            <form onSubmit={onSubmit}>
-                <CardContent className="grid gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input name="email" id="email" type="email" placeholder="m@example.com" required />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Пароль</Label>
-                        <Input name="password" id="password" type="password" required />
-                    </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-4">
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                        {isLoading ? "Вход..." : "Войти"}
-                    </Button>
-                    <div className="text-center text-sm text-muted-foreground">
-                        Нет аккаунта?{" "}
-                        <Link href="/register" className="underline hover:text-primary">
-                            Зарегистрироваться
-                        </Link>
-                    </div>
-                </CardFooter>
+                </p>
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-5">
+                <div className="space-y-2">
+                    <Label htmlFor="email" className="text-neutral-300">Email</Label>
+                    <Input
+                        name="email"
+                        id="email"
+                        type="email"
+                        placeholder="name@example.com"
+                        required
+                        className="h-12 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500/50"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="password" className="text-neutral-300">Пароль</Label>
+                    <Input
+                        name="password"
+                        id="password"
+                        type="password"
+                        required
+                        className="h-12 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500/50"
+                    />
+                </div>
+                <Button
+                    type="submit"
+                    className="w-full h-12 bg-white text-black hover:bg-white/90 font-semibold text-base rounded-xl"
+                    disabled={isLoading}
+                >
+                    {isLoading ? "Вход..." : "Войти"}
+                </Button>
             </form>
-        </Card>
+
+            <div className="mt-8 text-center text-sm text-neutral-500">
+                Нет аккаунта?{" "}
+                <Link href="/register" className="text-white hover:text-indigo-400 transition-colors font-medium">
+                    Зарегистрироваться
+                </Link>
+            </div>
+        </div>
     )
 }
-

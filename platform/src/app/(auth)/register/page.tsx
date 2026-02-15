@@ -1,14 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
@@ -35,53 +27,73 @@ export default function RegisterPage() {
             if (result?.error) {
                 toast.error(result.error)
             } else {
-                toast.success("Аккаунт успешно создан! Теперь войдите.")
+                toast.success("Аккаунт создан! Теперь войдите.")
                 router.push("/login")
             }
         } catch (error) {
-            console.error("Client side error:", error)
-            toast.error("Произошла ошибка. Попробуйте еще раз.")
+            toast.error("Произошла ошибка. Попробуйте ещё раз.")
         } finally {
             setIsLoading(false)
         }
     }
 
     return (
-        <Card className="w-full max-w-sm">
-            <CardHeader>
-                <CardTitle className="text-2xl">Регистрация</CardTitle>
-                <CardDescription>
-                    Создайте аккаунт, чтобы начать работу с Olynero AI.
-                </CardDescription>
-            </CardHeader>
-            <form onSubmit={onSubmit}>
-                <CardContent className="grid gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="name">Полное имя</Label>
-                        <Input name="name" id="name" placeholder="Иван Иванов" required />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input name="email" id="email" type="email" placeholder="m@example.com" required />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Пароль</Label>
-                        <Input name="password" id="password" type="password" required />
-                    </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-4">
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                        {isLoading ? "Создание аккаунта..." : "Создать аккаунт"}
-                    </Button>
-                    <div className="text-center text-sm text-muted-foreground">
-                        Уже есть аккаунт?{" "}
-                        <Link href="/login" className="underline hover:text-primary">
-                            Войти
-                        </Link>
-                    </div>
-                </CardFooter>
+        <div>
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold tracking-tight mb-2">Создать аккаунт</h1>
+                <p className="text-neutral-400">
+                    Начните работу с Olynero AI бесплатно.
+                </p>
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-5">
+                <div className="space-y-2">
+                    <Label htmlFor="name" className="text-neutral-300">Полное имя</Label>
+                    <Input
+                        name="name"
+                        id="name"
+                        placeholder="Иван Иванов"
+                        required
+                        className="h-12 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500/50"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="email" className="text-neutral-300">Email</Label>
+                    <Input
+                        name="email"
+                        id="email"
+                        type="email"
+                        placeholder="name@example.com"
+                        required
+                        className="h-12 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500/50"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="password" className="text-neutral-300">Пароль</Label>
+                    <Input
+                        name="password"
+                        id="password"
+                        type="password"
+                        placeholder="Минимум 6 символов"
+                        required
+                        className="h-12 bg-white/5 border-white/10 text-white placeholder:text-neutral-500 focus-visible:ring-indigo-500/50 focus-visible:border-indigo-500/50"
+                    />
+                </div>
+                <Button
+                    type="submit"
+                    className="w-full h-12 bg-white text-black hover:bg-white/90 font-semibold text-base rounded-xl"
+                    disabled={isLoading}
+                >
+                    {isLoading ? "Создание..." : "Создать аккаунт"}
+                </Button>
             </form>
-        </Card>
+
+            <div className="mt-8 text-center text-sm text-neutral-500">
+                Уже есть аккаунт?{" "}
+                <Link href="/login" className="text-white hover:text-indigo-400 transition-colors font-medium">
+                    Войти
+                </Link>
+            </div>
+        </div>
     )
 }
-

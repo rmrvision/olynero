@@ -32,19 +32,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ],
     callbacks: {
         ...authConfig.callbacks,
-        jwt({ token, user }) {
+        async jwt({ token, user }) {
             if (user) {
                 token.id = user.id;
                 token.email = user.email;
                 token.name = user.name;
+                // Fetch role from database
+                const dbUser = await db.user.findUnique({
+                    where: { id: user.id! },
+                    select: { role: true },
+                });
+                token.role = dbUser?.role ?? 'USER';
             }
             return token;
         },
         session({ session, token }) {
             if (session.user && token.id) {
-                session.user.id = token.id;
-                session.user.email = token.email ?? undefined;
-                session.user.name = token.name ?? undefined;
+                session.user.id = token.id as string;
+                session.user.email = (token.email as string) ?? undefined;
+                session.user.name = (token.name as string) ?? undefined;
+                session.user.role = token.role as string;
             }
             return session;
         },
