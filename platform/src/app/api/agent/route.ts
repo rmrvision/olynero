@@ -8,7 +8,8 @@ export async function POST(req: Request) {
         const validation = AgentRequestSchema.safeParse(body);
 
         if (!validation.success) {
-            return NextResponse.json({ error: validation.error.errors[0].message }, { status: 400 });
+            // @ts-ignore - Zod v4 compatibility fix
+            return NextResponse.json({ error: (validation.error as any).errors?.[0]?.message || "Invalid request" }, { status: 400 });
         }
 
         const { prompt } = validation.data;
