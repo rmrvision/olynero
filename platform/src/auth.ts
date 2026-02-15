@@ -37,12 +37,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.id = user.id;
                 token.email = user.email;
                 token.name = user.name;
-                // Fetch role from database
+            }
+            // Always refresh role from DB so manual role changes take effect without re-login
+            if (token.id) {
                 const dbUser = await db.user.findUnique({
-                    where: { id: user.id! },
-                    select: { role: true },
+                    where: { id: token.id as string },
+                    select: { role: true, isActive: true },
                 });
                 token.role = dbUser?.role ?? 'USER';
+                token.isActive = dbUser?.isActive ?? true;
             }
             return token;
         },
