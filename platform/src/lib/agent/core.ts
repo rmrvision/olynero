@@ -108,45 +108,134 @@ export class Agent {
     private async runRole(role: AgentRole, context?: string): Promise<string> {
         console.log(`[Role] Switching to ${role}...`);
 
-        // SIMULATION MOCKS
+        // --- SMART MOCK IMPLEMENTATION ---
+
         if (role === 'ARCHITECT') {
-            this.state.plan.push({
-                id: '1',
-                description: 'Create main app file with Golden Stack',
-                status: 'pending',
-                role: 'DEVELOPER'
-            });
-            console.log(`[Architect] logic plan created.`);
+            const mission = this.state.mission.toLowerCase();
+            let plan = [];
+
+            if (mission.includes('create') || mission.includes('build') || mission.includes('new')) {
+                // INTENT: CREATE NEW PROJECT
+                console.log(`[Architect] Detected intent: CREATE`);
+                plan.push({
+                    id: '1',
+                    description: mission.includes('dashboard') ? 'Create Dashboard Layout' : 'Create Landing Page',
+                    status: 'pending',
+                    role: 'DEVELOPER'
+                });
+            } else if (mission.includes('change') || mission.includes('update') || mission.includes('fix')) {
+                // INTENT: EDIT EXISTING PROJECT
+                console.log(`[Architect] Detected intent: EDIT`);
+                plan.push({
+                    id: '1',
+                    description: `Update App.tsx: ${this.state.mission}`,
+                    status: 'pending',
+                    role: 'DEVELOPER'
+                });
+            } else {
+                // DEFAULT
+                plan.push({
+                    id: '1',
+                    description: 'Create App.tsx',
+                    status: 'pending',
+                    role: 'DEVELOPER'
+                });
+            }
+
+            this.state.plan = plan; // Reset plan for this run
+            console.log(`[Architect] Plan created:`, JSON.stringify(plan));
             return "Plan created";
         }
 
         if (role === 'DEVELOPER') {
             const toolName = 'write_file';
+            const stepDescription = context?.split(' (Attempt')[0] || "";
 
-            // Simulate evolution:
-            // Attempt 1: Basic code
-            // Attempt 2: Premium code (Golden Stack)
-            const isPremium = context?.includes("Attempt 2") || context?.includes("Attempt 3");
+            // Check if we are editing or creating
+            const isEdit = stepDescription.includes("Update");
+            const targetFile = 'src/App.tsx'; // Default target for mock
 
-            const content = isPremium
-                ? '// PREMIUM CODE\nimport { Button } from "@/components/ui/button";\nexport default function App() { return <Button>Click me</Button> }'
-                : '// BASIC CODE\nconsole.log("Hello World");';
+            let content = "";
 
-            const args = { path: 'index.tsx', content };
+            if (isEdit) {
+                // --- EDIT LOGIC ---
+                const currentContent = this.state.files.get(targetFile) || "// No content found";
+                content = currentContent;
+
+                if (stepDescription.includes("color")) {
+                    // Mock color change: replace generic colors with asked color or random
+                    if (stepDescription.includes("red")) content = content.replace(/bg-\w+-\d+/g, 'bg-red-500');
+                    else if (stepDescription.includes("blue")) content = content.replace(/bg-\w+-\d+/g, 'bg-blue-500');
+                    else content = content.replace(/bg-slate-500/g, 'bg-green-500');
+                }
+
+                if (stepDescription.includes("title") || stepDescription.includes("text")) {
+                    content = content.replace(/<h1>.*<\/h1>/, '<h1>Updated Title</h1>');
+                }
+
+                console.log(`[Developer] Edited ${targetFile}`);
+
+            } else {
+                // --- CREATE LOGIC ---
+                if (stepDescription.includes("Dashboard")) {
+                    content = `import React from 'react';
+import { Button } from '@/components/ui/button';
+
+export default function App() {
+  return (
+    <div className="flex h-screen bg-slate-100">
+      <div className="w-64 bg-slate-900 text-white p-4">
+        <h1 className="text-xl font-bold mb-4">Dashboard</h1>
+        <nav className="flex flex-col gap-2">
+            <Button variant="ghost" className="justify-start">Home</Button>
+            <Button variant="ghost" className="justify-start">Settings</Button>
+        </nav>
+      </div>
+      <div className="flex-1 p-8">
+        <h2 className="text-2xl font-bold">Welcome User</h2>
+        <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="bg-white p-4 rounded shadow">Stat 1</div>
+            <div className="bg-white p-4 rounded shadow">Stat 2</div>
+            <div className="bg-white p-4 rounded shadow">Stat 3</div>
+        </div>
+      </div>
+    </div>
+  );
+}`;
+                } else {
+                    // Default Landing Page
+                    content = `import React from 'react';
+import { Button } from '@/components/ui/button';
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold mb-4">Welcome to Olynero</h1>
+      <p className="text-lg text-slate-600 mb-8">Building the future of AI coding.</p>
+      <div className="flex gap-4">
+        <Button>Get Started</Button>
+        <Button variant="outline">Learn More</Button>
+      </div>
+    </div>
+  );
+}`;
+                }
+                console.log(`[Developer] Created ${targetFile}`);
+            }
+
+            const args = { path: targetFile, content };
             await this.executeToolCall({ id: 'call_1', name: toolName, args });
             return "Task executed";
         }
 
         if (role === 'CRITIC') {
-            // Mocking the Critic's brain
-            // If the file contains "Button" (Shadcn), we approve.
-            // If it's just console.log, we reject.
-            const fileContent = this.state.files.get('index.tsx') || "";
+            const fileContent = this.state.files.get('src/App.tsx') || "";
 
-            if (fileContent.includes("Button")) {
+            // Quality Gate: Must have imports and export default
+            if (fileContent.includes("import") && fileContent.includes("export default")) {
                 return 'APPROVED';
             } else {
-                return 'REJECTED: Code is too basic. Use Shadcn/UI components.';
+                return 'REJECTED: Missing imports or export default.';
             }
         }
 

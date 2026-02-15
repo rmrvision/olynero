@@ -7,10 +7,18 @@ import { CodeEditor } from "@/components/code-editor";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
+import dynamic from 'next/dynamic';
+
+const Preview = dynamic(() => import('@/components/preview/preview-panel').then(mod => mod.Preview), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center h-full text-muted-foreground">Initializing Environment...</div>
+});
+
 export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [code, setCode] = useState("// Generated code will appear here...");
+  const [generatedFiles, setGeneratedFiles] = useState<any[]>([]);
 
   const handleGenerate = async () => {
     if (!prompt) return;
@@ -29,14 +37,17 @@ export default function Home() {
 
       if (data.status === 'success') {
         toast.success("Mission Accomplished!");
-        // In a real app, we would parse the artifacts.
-        // For now, let's just show a success message in the editor
-        // or read the "index.tsx" from artifacts if available.
-        const indexFile = data.artifacts?.find((f: any) => f.path.includes('index'));
+
+        // Update files for preview
+        if (data.artifacts) {
+          setGeneratedFiles(data.artifacts);
+        }
+
+        const indexFile = data.artifacts?.find((f: any) => f.path.includes('index') || f.path.includes('App') || f.path.includes('page'));
         if (indexFile) {
           setCode(indexFile.content);
         } else {
-          setCode("// Mission completed. Check console/output for details.");
+          setCode("// Mission completed. Check preview.");
         }
       } else {
         toast.error("Agent failed: " + data.error);
@@ -80,32 +91,22 @@ export default function Home() {
           </div>
 
           {/* Preview Pane */}
-          <div className="flex flex-col bg-slate-50 relative">
-            <div className="bg-white border-b p-2 flex gap-2 items-center">
-              <div className="flex gap-1">
-                <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                <div className="w-3 h-3 rounded-full bg-green-400"></div>
-              </div>
-              <Input className="h-6 text-xs w-full max-w-[300px] bg-slate-100 border-none" value="http://localhost:3000" readOnly />
-            </div>
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              Preview Frame will be here
-            </div>
+          <div className="flex flex-col relative h-full bg-slate-900 text-white">
+            <Preview files={generatedFiles} />
 
             {/* Chat Overlay */}
-            <div className="absolute bottom-4 left-4 right-4 max-w-2xl mx-auto">
-              <Card className="shadow-2xl border-primary/20">
+            <div className="absolute bottom-4 left-4 right-4 max-w-2xl mx-auto z-10">
+              <Card className="shadow-2xl border-white/10 bg-black/50 backdrop-blur-md text-white">
                 <CardContent className="p-2 flex gap-2">
                   <Input
                     placeholder="Describe what you want to build..."
-                    className="border-none shadow-none focus-visible:ring-0"
+                    className="border-none shadow-none focus-visible:ring-0 bg-transparent text-white placeholder:text-slate-400"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
                     disabled={isGenerating}
                   />
-                  <Button size="sm" onClick={handleGenerate} disabled={isGenerating}>
+                  <Button size="sm" onClick={handleGenerate} disabled={isGenerating} className="bg-blue-600 hover:bg-blue-500 text-white">
                     {isGenerating ? 'Thinking...' : 'Generate'}
                   </Button>
                 </CardContent>
