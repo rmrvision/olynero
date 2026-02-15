@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
                 role: true,
                 isActive: true,
                 createdAt: true,
-                _count: { select: { chats: true } },
+
             },
         }),
         db.user.count({ where }),

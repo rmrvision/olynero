@@ -21,7 +21,7 @@ model User {
 
   accounts      Account[]
   sessions      Session[]
-  chats         Chat[]
+  projects      Project[]
 }
 
 enum UserRole {
@@ -68,31 +68,84 @@ model VerificationToken {
   @@id([identifier, token])
 }
 
-model Chat {
-  id        String    @id @default(cuid())
-  title     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages  Message[]
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  files       File[]
+  messages    Message[]
+  actions     Action[]
 
   @@index([userId])
 }
 
+model File {
+  id        String   @id @default(cuid())
+  path      String   // e.g. "src/app/page.tsx", must be unique per project
+  content   String   @db.Text
+  version   Int      @default(1)
+  
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, path])
+  @@index([projectId])
+}
+
 model Message {
   id        String   @id @default(cuid())
-  content   String
+  content   String   @db.Text
   role      Role     @default(user)
+  
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
   createdAt DateTime @default(now())
-  chatId    String
-  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
-  @@index([chatId])
+  @@index([projectId])
+}
+
+model Action {
+  id        String      @id @default(cuid())
+  type      ActionType
+  status    ActionStatus @default(PENDING)
+  data      Json?       // Metadata (e.g. file path, shell command)
+  output    String?     @db.Text // Logs or result
+  
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@index([projectId])
 }
 
 enum Role {
   user
   assistant
   system
+}
+
+enum ActionType {
+  CREATE_FILE
+  UPDATE_FILE
+  DELETE_FILE
+  RUN_COMMAND
+  DEPLOY
+}
+
+enum ActionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
 }

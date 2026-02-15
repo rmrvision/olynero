@@ -43,29 +43,23 @@ export function AppSidebar() {
                     <div className="size-6 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold">O</div>
                     <span className="font-bold text-lg">Olynero</span>
                 </div>
-                <Button className="w-full justify-start gap-2" variant="outline">
-                    <Plus className="size-4" />
-                    Новый чат
-                </Button>
-            </SidebarHeader>
-            <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Недавние</SidebarGroupLabel>
+                    <SidebarGroupLabel>Меню</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {items.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </a>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="/">
+                                        <Home />
+                                        <span>Проекты</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
+            </SidebarHeader>
+            <SidebarContent>
             </SidebarContent>
             <SidebarFooter>
                 <SidebarMenu>

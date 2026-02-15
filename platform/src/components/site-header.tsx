@@ -99,7 +99,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     </div>
                     <nav className="flex items-center space-x-2">
                         {user ? (
-                            <Link href="/chat">
+                            <Link href="/dashboard">
                                 <Button className="bg-white text-black hover:bg-white/90">К консоли</Button>
                             </Link>
                         ) : (

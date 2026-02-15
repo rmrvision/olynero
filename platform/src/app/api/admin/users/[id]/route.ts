@@ -21,15 +21,6 @@ export async function GET(
             isActive: true,
             createdAt: true,
             updatedAt: true,
-            chats: {
-                orderBy: { createdAt: "desc" },
-                select: {
-                    id: true,
-                    title: true,
-                    createdAt: true,
-                    _count: { select: { messages: true } },
-                },
-            },
         },
     })
 
