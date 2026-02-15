@@ -10,7 +10,7 @@ export default function Layout({
     // We pass params.id down, but layout usually just wraps.
     // The "ProjectLayout" component will handle the resizable logic.
     return (
-        <div className="h-screen w-full overflow-hidden bg-background">
+        <div className="h-screen w-full overflow-hidden bg-background flex flex-col">
             {children}
         </div>
     );

@@ -9,7 +9,7 @@ export default function LandingPage() {
             <section className="relative w-full overflow-hidden pt-32 pb-40 md:pt-48 md:pb-52">
                 <div className="absolute top-0 left-1/2 -ml-[50%] w-[200%] h-[500px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/40 via-background to-background opacity-70 blur-3xl pointer-events-none" />
 
-                <div className="container relative z-10 flex flex-col items-center text-center">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-neutral-300 backdrop-blur-md mb-8 transition-colors hover:bg-white/10">
                         <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
                         Olynero v2.0 уже доступна
@@ -42,7 +42,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* Hero Image / Abstract Visual */}
-                <div className="container mt-20 relative">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-20 relative">
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10" />
                     <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm shadow-2xl shadow-indigo-500/10">
                         <div className="aspect-[16/9] rounded-lg bg-neutral-900/50 flex items-center justify-center overflow-hidden relative group">
@@ -58,7 +58,7 @@ export default function LandingPage() {
 
             {/* Social Proof */}
             <section className="w-full py-12 border-y border-white/5 bg-white/[0.02]">
-                <div className="container">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <p className="text-center text-sm font-medium text-neutral-500 mb-8 uppercase tracking-widest">Используется инженерными командами в</p>
                     <div className="flex flex-wrap justify-center gap-12 md:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
                         {/* Mock Logos */}
@@ -73,7 +73,7 @@ export default function LandingPage() {
 
             {/* Features Bento Grid */}
             <section id="features" className="w-full py-32 relative">
-                <div className="container">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center max-w-2xl mx-auto mb-20">
                         <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">Всё необходимое для запуска ИИ.</h2>
                         <p className="text-neutral-400 text-lg">От идеи до продакшена за минуты. Olynero предоставляет примитивы для создания программного обеспечения нового поколения.</p>
@@ -133,7 +133,7 @@ export default function LandingPage() {
             {/* CTA Section */}
             <section className="w-full py-40 border-t border-white/10 relative overflow-hidden">
                 <div className="absolute inset-0 bg-indigo-950/20" />
-                <div className="container relative z-10 text-center">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
                     <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">Готовы строить будущее?</h2>
                     <p className="text-neutral-400 text-xl max-w-2xl mx-auto mb-10">Присоединяйтесь к тысячам разработчиков, создающих ИИ-приложения следующего поколения с Olynero.</p>
                     <Link href="/register">

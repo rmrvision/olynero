@@ -13,7 +13,7 @@ import { useWebContainer } from "@/hooks/use-webcontainer";
 import { useDebouncedCallback } from "use-debounce";
 import { saveFileAction, deleteFileAction } from "@/actions/file-actions";
 import { toast } from "sonner";
-import { Loader2, Check, ArrowLeft, Code2, Settings, FileIcon, Sparkles } from "lucide-react";
+import { ArrowLeft, Code2, FileIcon, FolderOpen, Monitor, Bot } from "lucide-react";
 import { Preview as PreviewPanel } from "@/components/preview/preview-panel";
 import { AgentChat } from "@/components/agent-chat";
 import Link from "next/link";
@@ -49,6 +49,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
 
     const connected = !!instance && !bootLoading;
     const [previewKey, setPreviewKey] = useState(0);
+    const [activeTab, setActiveTab] = useState<"code" | "preview">("code");
 
     const editorRef = useRef<any>(null);
     const handleEditorDidMount = (editor: any, monaco: any) => {
@@ -190,11 +191,11 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
     };
 
     return (
-        <div className="min-h-screen bg-black text-white flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0 bg-black text-white flex flex-col overflow-hidden">
             {/* Background Gradients */}
             <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 via-black to-black pointer-events-none" />
 
-            <header className="relative z-10 h-14 border-b border-white/5 flex items-center justify-between px-4 bg-white/5 backdrop-blur-md">
+            <header className="relative z-10 h-14 border-b border-white/10 flex items-center justify-between px-6 bg-zinc-950/95 backdrop-blur-md">
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard" className="text-neutral-400 hover:text-white transition-colors">
                         <ArrowLeft className="w-5 h-5" />
@@ -210,7 +211,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/5">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900/80 border border-white/10">
                         <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
                         <span className="text-xs text-neutral-400 font-medium">
                             {connected ? 'Подключено' : 'Отключено'}
@@ -227,129 +228,150 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                 </div>
             </header>
 
-            <main className="relative z-10 flex-1 overflow-hidden p-2">
-                <ResizablePanelGroup direction="horizontal" className="h-full rounded-2xl border border-white/5 overflow-hidden shadow-2xl bg-black/40">
+            <main className="relative z-10 flex-1 min-h-0 overflow-hidden p-4 flex flex-col">
+                <ResizablePanelGroup direction="horizontal" className="flex-1 min-h-0 rounded-xl overflow-hidden border border-white/10 bg-zinc-950/80 shadow-2xl">
 
-                    {/* LEFT: File Explorer */}
-                    <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="bg-black/20 backdrop-blur-sm flex flex-col border-r border-white/5">
-                        <div className="p-3 border-b border-white/5 flex items-center justify-between bg-white/5">
-                            <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Файлы</span>
+                    {/* LEFT: AI Agent Chat */}
+                    <ResizablePanel defaultSize={28} minSize={24} maxSize={40} className="flex flex-col bg-zinc-950 border-r border-white/10">
+                        <div className="h-11 px-4 flex items-center gap-2 border-b border-white/10 bg-zinc-900/80">
+                            <Bot className="w-4 h-4 text-indigo-400" />
+                            <span className="text-sm font-semibold text-white">Olynero AI</span>
                         </div>
-                        <div className="flex-1 overflow-y-auto p-2">
-                            {bootLoading ? (
-                                <div className="space-y-2 animate-pulse">
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className="h-6 bg-white/5 rounded mx-2" />
-                                    ))}
+                        <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+                            {isReadOnly ? (
+                                <div className="flex items-center justify-center h-full text-neutral-500 text-sm p-4">
+                                    AI Ассистент недоступен в режиме чтения
                                 </div>
                             ) : (
-                                <FileTree
-                                    data={fileTree}
-                                    onSelect={handleFileSelect}
-                                    selectedPath={selectedFile || undefined}
+                                <AgentChat
+                                    projectId={project.id}
+                                    terminalLogs={terminalLogs || []}
+                                    onUpdateFile={handleFileUpdate}
+                                    onCreateFile={handleFileCreate}
+                                    onDeleteFile={handleFileDelete}
+                                    onRunCommand={handleRunCommand}
                                 />
                             )}
                         </div>
                     </ResizablePanel>
 
-                    <ResizableHandle className="w-px bg-white/5 hover:bg-indigo-500/50 transition-colors" />
+                    <ResizableHandle className="w-1.5 bg-white/5 hover:bg-indigo-500/30 transition-colors cursor-col-resize" />
 
-                    {/* MIDDLE: Editor */}
-                    <ResizablePanel defaultSize={40} minSize={30} className="bg-zinc-950/50 flex flex-col">
-                        {/* File Tabs */}
-                        <div className="h-9 flex items-center bg-black/40 border-b border-white/5 overflow-x-auto no-scrollbar">
-                            {selectedFile ? (
-                                <div className="px-4 py-2 text-xs text-indigo-300 bg-indigo-500/10 border-r border-t border-indigo-500/20 font-medium flex items-center gap-2 min-w-[120px]">
-                                    <FileIcon className="w-3 h-3" />
-                                    {selectedFile}
-                                </div>
+                    {/* RIGHT: Tabs (Code / Preview) */}
+                    <ResizablePanel defaultSize={72} minSize={50} className="flex flex-col bg-zinc-950 min-w-0">
+                        {/* Tab Switcher */}
+                        <div className="h-11 px-3 flex items-center gap-1 border-b border-white/10 bg-zinc-900/80">
+                            <button
+                                onClick={() => setActiveTab("code")}
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                                    activeTab === "code"
+                                        ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                                        : "text-neutral-400 hover:text-white hover:bg-white/5"
+                                }`}
+                            >
+                                <Code2 className="w-4 h-4" />
+                                Код
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("preview")}
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
+                                    activeTab === "preview"
+                                        ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                        : "text-neutral-400 hover:text-white hover:bg-white/5"
+                                }`}
+                            >
+                                <Monitor className="w-4 h-4" />
+                                Предпросмотр
+                            </button>
+                        </div>
+
+                        {/* Tab Content */}
+                        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                            {activeTab === "code" ? (
+                                <ResizablePanelGroup direction="horizontal" className="flex-1 min-h-0">
+                                    {/* File Tree */}
+                                    <ResizablePanel defaultSize={22} minSize={15} maxSize={35} className="flex flex-col bg-zinc-950 border-r border-white/10">
+                                        <div className="h-9 px-3 flex items-center gap-2 border-b border-white/5 bg-zinc-900/50">
+                                            <FolderOpen className="w-3.5 h-3.5 text-amber-400" />
+                                            <span className="text-xs font-semibold text-neutral-300">Файлы</span>
+                                        </div>
+                                        <div className="flex-1 overflow-y-auto p-2 bg-zinc-950/50">
+                                            {bootLoading ? (
+                                                <div className="space-y-2 animate-pulse p-2">
+                                                    {[1, 2, 3].map(i => (
+                                                        <div key={i} className="h-6 bg-white/5 rounded" />
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <FileTree
+                                                    data={fileTree}
+                                                    onSelect={handleFileSelect}
+                                                    selectedPath={selectedFile || undefined}
+                                                />
+                                            )}
+                                        </div>
+                                    </ResizablePanel>
+                                    <ResizableHandle className="w-1 bg-white/5 hover:bg-indigo-500/20 cursor-col-resize" />
+                                    {/* Editor */}
+                                    <ResizablePanel defaultSize={78} minSize={50} className="flex flex-col bg-zinc-900">
+                                        <div className="h-9 flex items-center gap-1 px-3 border-b border-white/5 bg-zinc-900/50 overflow-x-auto no-scrollbar">
+                                            {selectedFile ? (
+                                                <div className="px-3 py-1.5 text-xs text-indigo-300 bg-indigo-500/20 border border-indigo-500/30 rounded font-medium flex items-center gap-2">
+                                                    <FileIcon className="w-3 h-3" />
+                                                    <span className="truncate max-w-[200px]">{selectedFile}</span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-neutral-500">Выберите файл</span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 relative bg-zinc-900 min-h-0">
+                                            <Editor
+                                                path={selectedFile || undefined}
+                                                language={selectedFile ? getLanguageFromPath(selectedFile) : 'typescript'}
+                                                value={fileContent}
+                                                onChange={handleEditorChange}
+                                            />
+                                        </div>
+                                        <div className="h-6 bg-zinc-800 border-t border-white/5 text-zinc-400 text-[10px] px-3 flex items-center justify-between">
+                                            <span>{isSaving ? "Сохранение..." : "Сохранено"}</span>
+                                            <span>UTF-8</span>
+                                        </div>
+                                    </ResizablePanel>
+                                </ResizablePanelGroup>
                             ) : (
-                                <div className="px-4 py-2 text-xs text-neutral-500 italic">Файл не выбран</div>
-                            )}
-                        </div>
-                        <div className="flex-1 relative">
-                            <Editor
-                                path={selectedFile || undefined}
-                                language={selectedFile ? getLanguageFromPath(selectedFile) : 'typescript'}
-                                value={fileContent}
-                                onChange={handleEditorChange}
-                            />
-                        </div>
-                        {/* Status Bar */}
-                        <div className="h-6 bg-indigo-600 text-white text-[10px] px-3 flex items-center justify-between select-none">
-                            <div className="flex items-center gap-3">
-                                <span>main*</span>
-                                <span className="opacity-50">|</span>
-                                <span>{isSaving ? "Сохранение..." : "Сохранено"}</span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <span>UTF-8</span>
-                            </div>
-                        </div>
-                    </ResizablePanel>
-
-                    <ResizableHandle className="w-px bg-white/5 hover:bg-indigo-500/50 transition-colors" />
-
-                    {/* RIGHT: Agent & Preview */}
-                    <ResizablePanel defaultSize={40} minSize={30} className="flex flex-col bg-black/20 backdrop-blur-sm border-l border-white/5">
-                        <div className="flex-1 flex flex-col h-full">
-                            {/* Preview */}
-                            <div className="h-1/2 border-b border-white/5 flex flex-col">
-                                <div className="h-9 border-b border-white/5 flex items-center justify-between px-3 bg-white/5">
-                                    <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Предпросмотр</span>
-                                    {serverUrl && (
-                                        <a href={serverUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-400 hover:underline truncate max-w-[200px]">
-                                            {serverUrl}
-                                        </a>
-                                    )}
-                                </div>
-                                <div className="flex-1 relative bg-white">
-                                    <PreviewPanel
-                                        webContainer={instance}
-                                        serverUrl={serverUrl}
-                                        key={previewKey}
-                                    />
-                                    {bootLoading && (
-                                        <div className="absolute inset-0 bg-zinc-900/90 backdrop-blur flex flex-col items-center justify-center text-center p-4">
-                                            <div className="w-12 h-12 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
-                                            <p className="text-indigo-300 font-medium">Запуск окружения...</p>
-                                            <p className="text-neutral-500 text-xs mt-2">Установка пакетов и старт сервера</p>
-                                        </div>
-                                    )}
-                                    {bootError && (
-                                        <div className="absolute inset-0 bg-red-950/90 backdrop-blur flex items-center justify-center p-6 text-center">
-                                            <div>
-                                                <p className="text-red-400 font-medium mb-2">Ошибка запуска</p>
-                                                <p className="text-red-300/70 text-sm">{bootError}</p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Agent Chat */}
-                            <div className="h-1/2 flex flex-col bg-zinc-900/30">
-                                <div className="h-9 border-b border-white/5 flex items-center px-3 bg-white/5">
-                                    <Sparkles className="w-3 h-3 text-purple-400 mr-2" />
-                                    <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">AI Ассистент</span>
-                                </div>
-                                <div className="flex-1 overflow-hidden relative">
-                                    {isReadOnly ? (
-                                        <div className="flex items-center justify-center h-full text-neutral-500 text-sm">
-                                            AI Ассистент недоступен в режиме чтения
-                                        </div>
-                                    ) : (
-                                        <AgentChat
-                                            projectId={project.id}
-                                            terminalLogs={terminalLogs || []}
-                                            onUpdateFile={handleFileUpdate}
-                                            onCreateFile={handleFileCreate}
-                                            onDeleteFile={handleFileDelete}
-                                            onRunCommand={handleRunCommand}
+                                /* Preview Tab */
+                                <div className="flex-1 flex flex-col min-h-0 bg-white">
+                                    <div className="h-8 px-3 flex items-center justify-between border-b border-white/10 bg-zinc-100">
+                                        {serverUrl && (
+                                            <a href={serverUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline truncate max-w-[300px]">
+                                                {serverUrl}
+                                            </a>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 relative min-h-0">
+                                        <PreviewPanel
+                                            webContainer={instance}
+                                            serverUrl={serverUrl}
+                                            key={previewKey}
                                         />
-                                    )}
+                                        {bootLoading && (
+                                            <div className="absolute inset-0 bg-zinc-900/95 backdrop-blur flex flex-col items-center justify-center text-center p-4">
+                                                <div className="w-12 h-12 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
+                                                <p className="text-indigo-300 font-medium">Запуск окружения...</p>
+                                                <p className="text-neutral-500 text-xs mt-2">Установка пакетов и старт сервера</p>
+                                            </div>
+                                        )}
+                                        {bootError && (
+                                            <div className="absolute inset-0 bg-red-950/95 backdrop-blur flex items-center justify-center p-6 text-center">
+                                                <div>
+                                                    <p className="text-red-400 font-medium mb-2">Ошибка запуска</p>
+                                                    <p className="text-red-300/70 text-sm">{bootError}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </ResizablePanel>
 

@@ -1,13 +1,14 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Twitter, Linkedin, Github } from "lucide-react"
 
 export function SiteFooter() {
     return (
         <footer className="border-t border-white/10 bg-black text-white py-12 md:py-16 lg:py-20">
-            <div className="container grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
                 <div className="col-span-2 lg:col-span-2">
                     <div className="flex items-center gap-2 mb-4">
-                        <div className="size-6 rounded-md bg-white text-black flex items-center justify-center font-bold">O</div>
+                        <Image src="/olynero-logo.png" alt="Olynero" width={28} height={28} className="size-7" />
                         <span className="text-lg font-bold">Olynero</span>
                     </div>
                     <p className="text-sm text-neutral-400 max-w-xs mb-6">
@@ -53,7 +54,7 @@ export function SiteFooter() {
                     </ul>
                 </div>
             </div>
-            <div className="container mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
                 <p>&copy; {new Date().getFullYear()} Olynero Inc. Все права защищены.</p>
                 <div className="flex gap-6">
                     <span>Сделано командой Olynero</span>

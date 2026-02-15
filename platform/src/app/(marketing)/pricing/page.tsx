@@ -4,7 +4,7 @@ import Link from "next/link"
 
 export default function PricingPage() {
     return (
-        <div className="container py-24 md:py-32">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
             <div className="text-center max-w-2xl mx-auto mb-20">
                 <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-6 text-white">Простые и прозрачные тарифы</h1>
                 <p className="text-xl text-neutral-400">

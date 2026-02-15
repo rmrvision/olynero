@@ -1,7 +1,6 @@
 "use client";
 
 import Editor, { OnMount } from "@monaco-editor/react";
-import { useTheme } from "next-themes";
 import { useRef } from "react";
 
 interface CodeEditorProps {
@@ -12,7 +11,6 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({ value, language = "typescript", onChange, path }: CodeEditorProps) {
-    const { theme } = useTheme();
     const editorRef = useRef<any>(null);
 
     const handleEditorDidMount: OnMount = (editor, monaco) => {
@@ -20,13 +18,13 @@ export function CodeEditor({ value, language = "typescript", onChange, path }: C
     };
 
     return (
-        <div className="h-full w-full bg-background">
+        <div className="h-full w-full bg-zinc-900">
             <Editor
                 height="100%"
                 defaultLanguage={language}
                 language={language}
                 value={value}
-                theme={theme === "dark" ? "vs-dark" : "light"}
+                theme="vs-dark"
                 onChange={onChange}
                 onMount={handleEditorDidMount}
                 path={path} // crucial for monaco model URI

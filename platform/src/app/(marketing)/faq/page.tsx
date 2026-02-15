@@ -61,7 +61,7 @@ export default function FAQPage() {
         <div>
             <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -ml-[50%] w-[200%] h-[400px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-transparent to-transparent opacity-60 blur-3xl pointer-events-none" />
-                <div className="container relative z-10">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
                             Часто задаваемые вопросы
@@ -74,7 +74,7 @@ export default function FAQPage() {
             </section>
 
             <section className="pb-32">
-                <div className="container max-w-3xl mx-auto">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
                     <div className="space-y-4">
                         {faqs.map((faq, index) => (
                             <FAQItem key={index} question={faq.question} answer={faq.answer} />

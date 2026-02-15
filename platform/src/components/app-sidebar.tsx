@@ -1,6 +1,7 @@
 "use client"
 
-import { Layers, Terminal, Settings, ChevronDown, User2, LayoutDashboard, LogOut } from "lucide-react"
+import Image from "next/image"
+import { Layers, Settings, ChevronDown, User2, LayoutDashboard, LogOut } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -26,15 +27,13 @@ export function AppSidebar() {
     return (
         <Sidebar className="border-r border-white/5 bg-zinc-950/50 backdrop-blur-xl">
             <SidebarHeader className="border-b border-white/5 p-4">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400">
-                        <Terminal className="h-5 w-5" />
-                    </div>
+                <Link href="/dashboard" className="flex items-center gap-3">
+                    <Image src="/olynero-logo.png" alt="Olynero" width={32} height={32} className="size-8" />
                     <div className="flex flex-col gap-0.5">
                         <span className="font-semibold text-white">Olynero AI</span>
                         <span className="text-xs text-neutral-500">v1.2.0 Enterprise</span>
                     </div>
-                </div>
+                </Link>
             </SidebarHeader>
             <SidebarContent className="px-2 py-4">
                 <SidebarGroup>

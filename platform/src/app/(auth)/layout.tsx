@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Sparkles, Code2, Shield } from "lucide-react"
 
 export default function AuthLayout({
@@ -15,7 +16,7 @@ export default function AuthLayout({
 
                 <div className="relative z-10">
                     <Link href="/" className="flex items-center gap-2">
-                        <div className="size-8 rounded-lg bg-white text-black flex items-center justify-center font-bold text-lg">O</div>
+                        <Image src="/olynero-logo.png" alt="Olynero" width={36} height={36} className="size-9" priority />
                         <span className="text-xl font-bold">Olynero</span>
                     </Link>
                 </div>
@@ -52,7 +53,7 @@ export default function AuthLayout({
                     {/* Mobile logo */}
                     <div className="lg:hidden flex items-center gap-2 mb-10 justify-center">
                         <Link href="/" className="flex items-center gap-2">
-                            <div className="size-8 rounded-lg bg-white text-black flex items-center justify-center font-bold text-lg">O</div>
+                            <Image src="/olynero-logo.png" alt="Olynero" width={36} height={36} className="size-9" />
                             <span className="text-xl font-bold">Olynero</span>
                         </Link>
                     </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -33,10 +34,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-xl supports-[backdrop-filter]:bg-black/20">
-            <div className="container flex h-16 items-center">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center">
                 <div className="mr-8 hidden md:flex items-center">
                     <Link href={user ? "/dashboard" : "/"} className="mr-6 flex items-center space-x-2">
-                        <div className="size-6 rounded-md bg-white text-black flex items-center justify-center font-bold">O</div>
+                        <Image src="/olynero-logo.png" alt="Olynero" width={28} height={28} className="size-7" priority />
                         <span className="hidden font-bold sm:inline-block text-white">
                             Olynero
                         </span>
@@ -80,7 +81,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                 className="flex items-center"
                                 onClick={() => setIsOpen(false)}
                             >
-                                <div className="size-6 rounded-md bg-white text-black flex items-center justify-center font-bold mr-2">O</div>
+                                <Image src="/olynero-logo.png" alt="Olynero" width={28} height={28} className="size-7 mr-2" />
                                 <span className="font-bold">Olynero</span>
                             </Link>
                         </div>

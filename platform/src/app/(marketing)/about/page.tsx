@@ -39,7 +39,7 @@ export default function AboutPage() {
             {/* Hero */}
             <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -ml-[50%] w-[200%] h-[400px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-transparent to-transparent opacity-60 blur-3xl pointer-events-none" />
-                <div className="container relative z-10">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
                             Создание интеллектуального слоя интернета.
@@ -54,7 +54,7 @@ export default function AboutPage() {
 
             {/* Stats */}
             <section className="py-16 border-y border-white/5">
-                <div className="container">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                         {stats.map((stat, i) => (
                             <div key={i} className="text-center">
@@ -68,7 +68,7 @@ export default function AboutPage() {
 
             {/* Values */}
             <section className="py-24 md:py-32">
-                <div className="container">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-bold mb-4">Наши ценности</h2>
                         <p className="text-neutral-400 text-lg max-w-xl mx-auto">Принципы, которые определяют каждое наше решение.</p>
@@ -89,7 +89,7 @@ export default function AboutPage() {
 
             {/* Team */}
             <section className="py-24 border-t border-white/5">
-                <div className="container text-center">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">Наша команда</h2>
                     <p className="text-neutral-400 text-lg mb-12 max-w-xl mx-auto">Инженеры и исследователи, объединённые общей целью.</p>
                     <div className="flex flex-wrap justify-center gap-6 mb-12">

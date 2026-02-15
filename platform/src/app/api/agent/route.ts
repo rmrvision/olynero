@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google";
-import { streamText, tool } from "ai";
+import { streamText, convertToModelMessages, generateId } from "ai";
 import { db } from "@/lib/db"; // Adjust import based on your setup
 import { auth } from "@/auth"; // Adjust import based on your setup
 import { z } from "zod";
@@ -19,6 +19,8 @@ export async function POST(req: Request) {
     if (!projectId) {
         return new Response("Missing projectId", { status: 400 });
     }
+
+    const modelMessages = await convertToModelMessages(messages);
 
     // 1. Get Project Context
     // We fetch all file paths to give the AI structure awareness
@@ -61,7 +63,7 @@ Environment:
     const result = streamText({
         model: google("gemini-2.0-flash-exp"), // Using a capable model
         system: systemPrompt,
-        messages,
+        messages: modelMessages,
         tools: {
             updateFile: {
                 description: "Create or update a file in the project. Always provide the full file content.",
@@ -128,5 +130,8 @@ Environment:
         } as any,
     });
 
-    return result.toTextStreamResponse();
+    return result.toUIMessageStreamResponse({
+        originalMessages: messages,
+        generateMessageId: generateId,
+    });
 }

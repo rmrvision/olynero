@@ -38,7 +38,7 @@ export default function ResourcesPage() {
             {/* Hero */}
             <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -ml-[50%] w-[200%] h-[400px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/30 via-transparent to-transparent opacity-60 blur-3xl pointer-events-none" />
-                <div className="container relative z-10">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="text-center max-w-2xl mx-auto">
                         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
                             Ресурсы и поддержка
@@ -52,7 +52,7 @@ export default function ResourcesPage() {
 
             {/* Resources Grid */}
             <section className="pb-32">
-                <div className="container">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {resources.map((item, i) => (
                             <div key={i} className="p-8 rounded-3xl border border-white/10 bg-white/5 text-center hover:border-white/20 transition-all group">
