@@ -5,17 +5,28 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FileTree, FileNode } from "@/components/file-tree";
-import { CodeEditor } from "@/components/code-editor";
+import { CodeEditor as Editor } from "@/components/code-editor";
 import { buildFileTree } from "@/lib/file-utils";
 import { useWebContainer } from "@/hooks/use-webcontainer"; // NEW
 import { useDebouncedCallback } from "use-debounce";
 import { saveFileAction, deleteFileAction } from "@/actions/file-actions";
 import { toast } from "sonner";
-import { Loader2, Check } from "lucide-react";
+import { Loader2, Check, ArrowLeft, Code2, Settings, FileIcon, Sparkles } from "lucide-react";
 import { Preview as PreviewPanel } from "@/components/preview/preview-panel";
 import { AgentChat } from "@/components/agent-chat";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+const getLanguageFromPath = (path: string) => {
+    if (path.endsWith(".tsx") || path.endsWith(".ts")) return "typescript";
+    if (path.endsWith(".jsx") || path.endsWith(".js")) return "javascript";
+    if (path.endsWith(".css")) return "css";
+    if (path.endsWith(".html")) return "html";
+    if (path.endsWith(".json")) return "json";
+    return "plaintext";
+};
 
 interface ProjectClientPageProps {
     project: any; // Type this properly later
@@ -31,7 +42,15 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
     const [fileContent, setFileContent] = useState<string>("// Select a file to edit");
 
     // Boot WebContainer
-    const { instance, loading: bootLoading, error: bootError, serverUrl } = useWebContainer({ files });
+    const { instance, loading: bootLoading, error: bootError, serverUrl, terminalLogs } = useWebContainer({ files });
+
+    const connected = !!instance && !bootLoading;
+    const [previewKey, setPreviewKey] = useState(0);
+
+    const editorRef = useRef<any>(null);
+    const handleEditorDidMount = (editor: any, monaco: any) => {
+        editorRef.current = editor;
+    };
 
     const handleFileSelect = (path: string) => {
         const file = fileList.find(f => f.path === path);
@@ -68,7 +87,7 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
         // 2. Update WebContainer (Immediate)
         if (instance) {
             const cleanPath = selectedFile.startsWith('/') ? selectedFile.slice(1) : selectedFile;
-            instance.fs.writeFile(cleanPath, value).catch(err => {
+            instance.fs.writeFile(cleanPath, value).catch((err: any) => {
                 console.error("Failed to write to WebContainer:", err);
             });
         }
@@ -167,82 +186,157 @@ export default function ProjectClientPage({ project, files }: ProjectClientPageP
     };
 
     return (
-        <div className="h-full w-full bg-background overflow-hidden">
-            <ResizablePanelGroup direction="horizontal" className="h-full w-full">
-                {/* Left Panel: File Tree */}
-                <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="border-r bg-muted/10">
-                    <div className="flex h-full flex-col">
-                        <div className="p-3 border-b text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                            Files
-                        </div>
-                        <div className="flex-1 overflow-auto">
-                            <FileTree data={fileTree} onSelect={handleFileSelect} selectedPath={selectedFile || undefined} />
-                        </div>
+        <div className="min-h-screen bg-black text-white flex flex-col overflow-hidden">
+            {/* Background Gradients */}
+            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 via-black to-black pointer-events-none" />
+
+            <header className="relative z-10 h-14 border-b border-white/5 flex items-center justify-between px-4 bg-white/5 backdrop-blur-md">
+                <div className="flex items-center gap-4">
+                    <Link href="/dashboard" className="text-neutral-400 hover:text-white transition-colors">
+                        <ArrowLeft className="w-5 h-5" />
+                    </Link>
+                    <div className="flex items-center gap-2">
+                        <Code2 className="w-5 h-5 text-indigo-400" />
+                        <span className="font-semibold text-sm">{project.name}</span>
                     </div>
-                </ResizablePanel>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/5">
+                        <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
+                        <span className="text-xs text-neutral-400 font-medium">
+                            {connected ? 'Connected' : 'Disconnected'}
+                        </span>
+                    </div>
+                    <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white hover:bg-white/5">
+                        <Settings className="w-4 h-4" />
+                    </Button>
+                </div>
+            </header>
 
-                <ResizableHandle withHandle />
+            <main className="relative z-10 flex-1 overflow-hidden p-2">
+                <ResizablePanelGroup direction="horizontal" className="h-full rounded-2xl border border-white/5 overflow-hidden shadow-2xl bg-black/40">
 
-                {/* Center Panel: Code Editor */}
-                <ResizablePanel defaultSize={40}>
-                    <div className="flex h-full flex-col">
-                        <div className="h-9 border-b flex items-center px-4 bg-muted/10 text-xs text-muted-foreground justify-between">
-                            <span>{selectedFile || "No file selected"}</span>
-                            {selectedFile && (
-                                <span className="flex items-center gap-1">
-                                    {isSaving ? (
-                                        <>
-                                            <Loader2 className="w-3 h-3 animate-spin" />
-                                            Saving...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Check className="w-3 h-3 text-green-500" />
-                                            Saved
-                                        </>
-                                    )}
-                                </span>
+                    {/* LEFT: File Explorer */}
+                    <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="bg-black/20 backdrop-blur-sm flex flex-col border-r border-white/5">
+                        <div className="p-3 border-b border-white/5 flex items-center justify-between bg-white/5">
+                            <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Explorer</span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-2">
+                            {bootLoading ? (
+                                <div className="space-y-2 animate-pulse">
+                                    {[1, 2, 3].map(i => (
+                                        <div key={i} className="h-6 bg-white/5 rounded mx-2" />
+                                    ))}
+                                </div>
+                            ) : (
+                                <FileTree
+                                    data={fileTree}
+                                    onSelect={handleFileSelect}
+                                    selectedPath={selectedFile || undefined}
+                                />
                             )}
                         </div>
-                        <div className="flex-1">
-                            <CodeEditor
-                                value={fileContent}
-                                language="typescript" // Detect based on extension later
-                                onChange={handleEditorChange}
+                    </ResizablePanel>
+
+                    <ResizableHandle className="w-px bg-white/5 hover:bg-indigo-500/50 transition-colors" />
+
+                    {/* MIDDLE: Editor */}
+                    <ResizablePanel defaultSize={40} minSize={30} className="bg-zinc-950/50 flex flex-col">
+                        {/* File Tabs */}
+                        <div className="h-9 flex items-center bg-black/40 border-b border-white/5 overflow-x-auto no-scrollbar">
+                            {selectedFile ? (
+                                <div className="px-4 py-2 text-xs text-indigo-300 bg-indigo-500/10 border-r border-t border-indigo-500/20 font-medium flex items-center gap-2 min-w-[120px]">
+                                    <FileIcon className="w-3 h-3" />
+                                    {selectedFile}
+                                </div>
+                            ) : (
+                                <div className="px-4 py-2 text-xs text-neutral-500 italic">No file selected</div>
+                            )}
+                        </div>
+                        <div className="flex-1 relative">
+                            <Editor
                                 path={selectedFile || undefined}
+                                language={selectedFile ? getLanguageFromPath(selectedFile) : 'typescript'}
+                                value={fileContent}
+                                onChange={handleEditorChange}
                             />
                         </div>
-                    </div>
-                </ResizablePanel>
+                        {/* Status Bar */}
+                        <div className="h-6 bg-indigo-600 text-white text-[10px] px-3 flex items-center justify-between select-none">
+                            <div className="flex items-center gap-3">
+                                <span>main*</span>
+                                <span className="opacity-50">|</span>
+                                <span>{isSaving ? "Saving..." : "Saved"}</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <span>TypeScript React</span>
+                                <span className="opacity-50">|</span>
+                                <span>UTF-8</span>
+                            </div>
+                        </div>
+                    </ResizablePanel>
 
-                <ResizableHandle withHandle />
+                    <ResizableHandle className="w-px bg-white/5 hover:bg-indigo-500/50 transition-colors" />
 
-                {/* Right Panel: Preview & Chat */}
-                <ResizablePanel defaultSize={40}>
-                    <ResizablePanelGroup direction="vertical">
-                        <ResizablePanel defaultSize={70}>
-                            {/* Preview Panel (WebContainer + Terminal) */}
-                            <PreviewPanel
-                                webContainer={instance}
-                                serverUrl={serverUrl} // We need to expose this from useWebContainer
-                            />
-                        </ResizablePanel>
+                    {/* RIGHT: Agent & Preview */}
+                    <ResizablePanel defaultSize={40} minSize={30} className="flex flex-col bg-black/20 backdrop-blur-sm border-l border-white/5">
+                        <div className="flex-1 flex flex-col h-full">
+                            {/* Preview */}
+                            <div className="h-1/2 border-b border-white/5 flex flex-col">
+                                <div className="h-9 border-b border-white/5 flex items-center justify-between px-3 bg-white/5">
+                                    <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Preview</span>
+                                    {serverUrl && (
+                                        <a href={serverUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] text-blue-400 hover:underline truncate max-w-[200px]">
+                                            {serverUrl}
+                                        </a>
+                                    )}
+                                </div>
+                                <div className="flex-1 relative bg-white">
+                                    <PreviewPanel
+                                        webContainer={instance}
+                                        serverUrl={serverUrl}
+                                        key={previewKey}
+                                    />
+                                    {bootLoading && (
+                                        <div className="absolute inset-0 bg-zinc-900/90 backdrop-blur flex flex-col items-center justify-center text-center p-4">
+                                            <div className="w-12 h-12 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
+                                            <p className="text-indigo-300 font-medium">Booting Dev Environment...</p>
+                                            <p className="text-neutral-500 text-xs mt-2">Installing dependencies & starting server</p>
+                                        </div>
+                                    )}
+                                    {bootError && (
+                                        <div className="absolute inset-0 bg-red-950/90 backdrop-blur flex items-center justify-center p-6 text-center">
+                                            <div>
+                                                <p className="text-red-400 font-medium mb-2">Boot Failed</p>
+                                                <p className="text-red-300/70 text-sm">{bootError}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
 
-                        <ResizableHandle withHandle />
-
-                        <ResizablePanel defaultSize={30}>
                             {/* Agent Chat */}
-                            <AgentChat
-                                projectId={project.id}
-                                onUpdateFile={handleFileUpdate}
-                                onCreateFile={handleFileCreate}
-                                onDeleteFile={handleFileDelete}
-                                onRunCommand={handleRunCommand}
-                            />
-                        </ResizablePanel>
-                    </ResizablePanelGroup>
-                </ResizablePanel>
-            </ResizablePanelGroup>
+                            <div className="h-1/2 flex flex-col bg-zinc-900/30">
+                                <div className="h-9 border-b border-white/5 flex items-center px-3 bg-white/5">
+                                    <Sparkles className="w-3 h-3 text-purple-400 mr-2" />
+                                    <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">AI Assistant</span>
+                                </div>
+                                <div className="flex-1 overflow-hidden relative">
+                                    <AgentChat
+                                        projectId={project.id}
+                                        terminalLogs={terminalLogs || []}
+                                        onUpdateFile={handleFileUpdate}
+                                        onCreateFile={handleFileCreate}
+                                        onDeleteFile={handleFileDelete}
+                                        onRunCommand={handleRunCommand}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </ResizablePanel>
+
+                </ResizablePanelGroup>
+            </main>
         </div>
     );
 }

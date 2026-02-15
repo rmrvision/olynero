@@ -23,30 +23,32 @@ export async function POST(req: Request) {
     // 1. Get Project Context
     // We fetch all file paths to give the AI structure awareness
     // We only fetch content for files potentially relevant (or assume small project fits all content for now)
-    // For MVP, we'll fetch all content. For scale, we'd need RAG or smarter selection.
-    const files = await db.file.findMany({
+    // OPTIMIZATION: Only fetch paths initially. User 'readFile' tool to get content.
+    const filePaths = await db.file.findMany({
         where: {
             projectId: projectId,
         },
         select: {
             path: true,
-            content: true,
         }
     });
 
-    const fileContext = files.map(f => `File: ${f.path}\nContent:\n${f.content}`).join("\n\n");
+    // Simple directory structure
+    const fileStructure = filePaths.map(f => f.path).join("\n");
 
     const systemPrompt = `
 You are an expert Full Stack React & Node.js Developer acting as the intelligence for a web-based IDE.
 Your task is to help the user build, debug, and modify their project.
 
-Current Application Context:
-${fileContext}
+Current File Structure:
+${fileStructure}
 
 Capabilities:
 - You verify your code changes before submitting.
-- You can create, update, and delete files using the provided tools.
-- When asked to modify code, ALWAYS return the COMPLETE new file content using the 'updateFile' tool. Do not just return snippets or diffs unless asked for unrelated explanations.
+- You can create, update, and delete files.
+- You can READ files using the 'readFile' tool. Do not guess content.
+- If you suspect a build error, use 'getTerminalLogs' to see what's wrong.
+- When asked to modify code, ALWAYS return the COMPLETE new file content using the 'updateFile' tool.
 - Be concise. Focus on code.
 - If you lack information, ask for it.
 
@@ -81,6 +83,22 @@ Environment:
                     return { message: `Created ${path}` };
                 }) as any
             },
+            readFile: {
+                description: "Read the content of a specific file.",
+                parameters: z.object({
+                    path: z.string().describe("The file path to read."),
+                }),
+                execute: async ({ path }: { path: string }) => {
+                    const file = await db.file.findFirst({
+                        where: {
+                            projectId,
+                            path
+                        }
+                    });
+                    if (!file) return { error: "File not found" };
+                    return { content: file.content };
+                }
+            },
             runCommand: {
                 description: "Run a shell command in the project environment.",
                 parameters: z.object({
@@ -88,6 +106,14 @@ Environment:
                 }),
                 execute: (async ({ command }: { command: string }) => {
                     return { message: `Executed command: ${command}` };
+                }) as any
+            },
+            getTerminalLogs: {
+                description: "Get the recent terminal output logs (stdout/stderr) from the dev server and install processes. Use this to debug errors.",
+                parameters: z.object({}),
+                // Client-side execution intercept, but we define it here so model knows about it
+                execute: (async () => {
+                    return { message: "Terminal logs requested." };
                 }) as any
             },
             deleteFile: {

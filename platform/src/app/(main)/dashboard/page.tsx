@@ -1,17 +1,9 @@
 import { auth } from "@/auth";
-import { getUserProjects, createProject } from "@/lib/projects";
+import { getUserProjects } from "@/lib/projects";
 import { redirect } from "next/navigation";
-import { Plus, Folder } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { ProjectGrid } from "@/components/dashboard/project-grid";
 import { CreateProjectButton } from "@/components/create-project-button";
+import { Sparkles } from "lucide-react";
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -22,43 +14,42 @@ export default async function DashboardPage() {
     const projects = await getUserProjects(session.user.id);
 
     return (
-        <div className="p-8 max-w-6xl mx-auto">
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold mb-2">Мои Проекты</h1>
-                    <p className="text-muted-foreground">Управляйте своими AI-приложениями.</p>
-                </div>
-                <CreateProjectButton />
-            </div>
+        <div className="min-h-screen bg-black">
+            {/* Background Gradients */}
+            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-black to-black pointer-events-none" />
 
-            {projects.length === 0 ? (
-                <div className="text-center py-20 border border-dashed rounded-xl bg-muted/30">
-                    <div className="mx-auto size-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                        <Folder className="size-8 text-muted-foreground" />
+            <div className="relative z-10 p-8 max-w-7xl mx-auto">
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16 pt-12">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-indigo-300 mb-4">
+                            <Sparkles className="size-3" />
+                            <span>AI-Native Workspace</span>
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-3">
+                            Welcome back, {session.user.name?.split(' ')[0]}
+                        </h1>
+                        <p className="text-lg text-neutral-400 max-w-lg">
+                            Ready to build something extraordinary immediately?
+                        </p>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">Нет проектов</h3>
-                    <p className="text-muted-foreground mb-6">Создайте свой первый проект, чтобы начать.</p>
-                    <CreateProjectButton />
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {projects.map((project) => (
-                        <Link key={project.id} href={`/project/${project.id}`}>
-                            <Card className="h-full hover:bg-muted/50 transition-colors cursor-pointer group">
-                                <CardHeader>
-                                    <CardTitle className="group-hover:text-primary transition-colors">{project.name}</CardTitle>
-                                    <CardDescription className="line-clamp-2">
-                                        {project.description || "Без описания"}
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardFooter className="text-xs text-muted-foreground">
-                                    Обновлено: {new Date(project.updatedAt).toLocaleDateString()}
-                                </CardFooter>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
-            )}
+                    <div>
+                        <CreateProjectButton />
+                    </div>
+                </header>
+
+                <main>
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                            Recent Projects
+                            <span className="text-sm font-normal text-neutral-500 bg-white/5 px-2 py-0.5 rounded-full">
+                                {projects.length}
+                            </span>
+                        </h2>
+                    </div>
+
+                    <ProjectGrid projects={projects} />
+                </main>
+            </div>
         </div>
     );
 }

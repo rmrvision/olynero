@@ -15,6 +15,18 @@ export function useWebContainer({ files }: UseWebContainerProps) {
     const [serverUrl, setServerUrl] = useState<string | null>(null);
     const mountedRef = useRef(false);
 
+    const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
+
+    const addLog = (data: string) => {
+        setTerminalLogs(prev => {
+            const newLogs = [...prev, data];
+            if (newLogs.length > 100) {
+                return newLogs.slice(newLogs.length - 100);
+            }
+            return newLogs;
+        });
+    };
+
     useEffect(() => {
         let isMounted = true;
 
@@ -59,26 +71,31 @@ export function useWebContainer({ files }: UseWebContainerProps) {
                     // Install dependencies if package.json exists
                     if (fileSystemTree['package.json']) {
                         console.log("Installing dependencies...");
+                        addLog("[System] Installing dependencies...\n");
                         const installProcess = await webcontainer.spawn('npm', ['install']);
                         installProcess.output.pipeTo(new WritableStream({
                             write(data) {
                                 console.log('[npm install]', data);
+                                addLog(data);
                             }
                         }));
                         await installProcess.exit;
                     }
 
                     console.log("Starting dev server...");
+                    addLog("[System] Starting dev server...\n");
                     const devProcess = await webcontainer.spawn('npm', ['run', 'dev']);
                     devProcess.output.pipeTo(new WritableStream({
                         write(data) {
                             console.log('[dev server]', data);
+                            addLog(data);
                         }
                     }));
 
                     webcontainer.on('server-ready', (port, url) => {
                         console.log('Server ready:', port, url);
                         setServerUrl(url);
+                        addLog(`[System] Server ready at ${url}\n`);
                     });
 
                     console.log("WebContainer ready.");
@@ -98,5 +115,5 @@ export function useWebContainer({ files }: UseWebContainerProps) {
         };
     }, []); // Boot once
 
-    return { instance, loading, error, serverUrl, mountFile: instance?.fs.writeFile };
+    return { instance, loading, error, serverUrl, mountFile: instance?.fs.writeFile, terminalLogs };
 }
