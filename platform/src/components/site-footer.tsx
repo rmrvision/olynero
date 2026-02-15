@@ -35,7 +35,6 @@ export function SiteFooter() {
                     <ul className="space-y-3 text-sm text-neutral-400">
                         <li><Link href="/about" className="hover:text-white transition-colors">О нас</Link></li>
                         <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
-                        <li><Link href="/resources" className="hover:text-white transition-colors">Ресурсы</Link></li>
                     </ul>
                 </div>
 

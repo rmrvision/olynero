@@ -5,8 +5,6 @@ import Link from "next/link"
 import {
     LayoutDashboard,
     Users,
-    MessageSquare,
-    BarChart3,
     Settings,
     ArrowLeft,
     Shield,
@@ -29,8 +27,6 @@ import { cn } from "@/lib/utils"
 const navItems = [
     { title: "Дашборд", href: "/admin", icon: LayoutDashboard },
     { title: "Пользователи", href: "/admin/users", icon: Users },
-    { title: "Чаты", href: "/admin/chats", icon: MessageSquare },
-    { title: "Аналитика", href: "/admin/analytics", icon: BarChart3 },
     { title: "Настройки", href: "/admin/settings", icon: Settings },
 ]
 
@@ -38,18 +34,18 @@ export function AdminSidebar() {
     const pathname = usePathname()
 
     return (
-        <Sidebar>
-            <SidebarHeader>
+        <Sidebar className="border-r border-white/5 bg-zinc-950/50 backdrop-blur-xl">
+            <SidebarHeader className="border-b border-white/5 p-4">
                 <div className="flex items-center gap-2 px-2 py-1">
-                    <div className="size-6 rounded-md bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs">
+                    <div className="size-6 rounded-md bg-indigo-500/20 flex items-center justify-center text-indigo-400">
                         <Shield className="size-3.5" />
                     </div>
-                    <span className="font-bold text-lg">Админ</span>
+                    <span className="font-bold text-lg text-white">Админ</span>
                 </div>
             </SidebarHeader>
-            <SidebarContent>
+            <SidebarContent className="px-2 py-4">
                 <SidebarGroup>
-                    <SidebarGroupLabel>Навигация</SidebarGroupLabel>
+                    <SidebarGroupLabel className="text-xs font-medium uppercase text-neutral-500">Навигация</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {navItems.map((item) => {
@@ -71,11 +67,11 @@ export function AdminSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
-            <SidebarFooter>
+            <SidebarFooter className="border-t border-white/5 p-4">
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                            <Link href="/chat">
+                            <Link href="/dashboard">
                                 <ArrowLeft />
                                 <span className="text-sm">Вернуться в приложение</span>
                             </Link>

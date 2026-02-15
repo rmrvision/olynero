@@ -81,10 +81,10 @@ export default function AdminUsersPage() {
     }
 
     return (
-        <div className="p-6 md:p-8 space-y-6">
+        <div className="p-6 md:p-8 space-y-6 text-white">
             <div>
-                <h1 className="text-2xl font-bold mb-1">Пользователи</h1>
-                <p className="text-sm text-muted-foreground">Управление пользователями платформы ({total} всего)</p>
+                <h1 className="text-2xl font-bold mb-1 text-white">Пользователи</h1>
+                <p className="text-sm text-neutral-400">Управление пользователями платформы ({total} всего)</p>
             </div>
 
             {/* Search */}
@@ -102,7 +102,7 @@ export default function AdminUsersPage() {
             </form>
 
             {/* Table */}
-            <div className="rounded-xl border bg-card">
+            <div className="rounded-xl border border-white/10 bg-white/5">
                 <Table>
                     <TableHeader>
                         <TableRow>

@@ -23,6 +23,7 @@ const navigation = [
     { name: "Решения", href: "/solutions" },
     { name: "Тарифы", href: "/pricing" },
     { name: "Ресурсы", href: "/resources" },
+    { name: "FAQ", href: "/faq" },
     { name: "О нас", href: "/about" },
 ]
 
@@ -33,8 +34,8 @@ export function SiteHeader({ user }: SiteHeaderProps) {
     return (
         <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-xl supports-[backdrop-filter]:bg-black/20">
             <div className="container flex h-16 items-center">
-                <div className="mr-8 hidden md:flex">
-                    <Link href="/" className="mr-6 flex items-center space-x-2">
+                <div className="mr-8 hidden md:flex items-center">
+                    <Link href={user ? "/dashboard" : "/"} className="mr-6 flex items-center space-x-2">
                         <div className="size-6 rounded-md bg-white text-black flex items-center justify-center font-bold">O</div>
                         <span className="hidden font-bold sm:inline-block text-white">
                             Olynero

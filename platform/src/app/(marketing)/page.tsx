@@ -32,9 +32,9 @@ export default function LandingPage() {
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </Link>
-                        <Link href="/#features">
+                        <Link href="/resources">
                             <Button variant="outline" size="lg" className="h-12 px-8 text-base border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white rounded-full">
-                                Документация
+                                Ресурсы и документация
                             </Button>
                         </Link>
                     </div>

@@ -32,12 +32,12 @@ export default async function AdminDashboard() {
     ];
 
     return (
-        <div className="p-8">
-            <h1 className="text-3xl font-bold mb-8">Панель управления</h1>
+        <div className="p-8 text-white">
+            <h1 className="text-3xl font-bold mb-8 text-white">Панель управления</h1>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {statCards.map((stat, index) => (
-                    <div key={index} className="p-6 rounded-2xl border border-white/10 bg-white/5">
+                    <div key={index} className="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors">
                         <div className="flex items-center justify-between mb-4">
                             <div className={`p-3 rounded-xl ${stat.bg}`}>
                                 <stat.icon className={`size-6 ${stat.color}`} />
@@ -53,7 +53,7 @@ export default async function AdminDashboard() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Recent Users */}
-                <div className="p-6 rounded-2xl border border-white/10 bg-white/5">
+                <div className="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors">
                     <h3 className="text-xl font-bold mb-6">Новые пользователи</h3>
                     <div className="space-y-4">
                         {stats.recentUsers.map((user: any) => (

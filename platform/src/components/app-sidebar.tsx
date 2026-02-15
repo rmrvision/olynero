@@ -1,6 +1,8 @@
 "use client"
 
-import { Home, Layers, Terminal, Settings, ChevronUp, User2, LayoutDashboard } from "lucide-react"
+import { Layers, Terminal, Settings, ChevronUp, User2, LayoutDashboard } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 import {
     Sidebar,
@@ -19,6 +21,7 @@ import { useSession, signOut } from "next-auth/react"
 
 export function AppSidebar() {
     const { data: session } = useSession();
+    const pathname = usePathname();
 
     return (
         <Sidebar className="border-r border-white/5 bg-zinc-950/50 backdrop-blur-xl">
@@ -39,19 +42,27 @@ export function AppSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="text-neutral-400 hover:bg-white/5 hover:text-white data-[active=true]:bg-white/5 data-[active=true]:text-white">
-                                    <a href="/dashboard">
+                                <SidebarMenuButton asChild isActive={pathname === "/dashboard"} className="text-neutral-400 hover:bg-white/5 hover:text-white data-[active=true]:bg-white/5 data-[active=true]:text-white">
+                                    <Link href="/dashboard">
                                         <LayoutDashboard className="h-4 w-4" />
                                         <span>Дашборд</span>
-                                    </a>
+                                    </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild className="text-neutral-400 hover:bg-white/5 hover:text-white">
-                                    <a href="/projects">
+                                <SidebarMenuButton asChild isActive={pathname === "/dashboard"} className="text-neutral-400 hover:bg-white/5 hover:text-white data-[active=true]:bg-white/5 data-[active=true]:text-white">
+                                    <Link href="/dashboard">
                                         <Layers className="h-4 w-4" />
                                         <span>Мои Проекты</span>
-                                    </a>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild isActive={pathname === "/settings"} className="text-neutral-400 hover:bg-white/5 hover:text-white data-[active=true]:bg-white/5 data-[active=true]:text-white">
+                                    <Link href="/settings">
+                                        <Settings className="h-4 w-4" />
+                                        <span>Настройки</span>
+                                    </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
@@ -82,9 +93,11 @@ export function AppSidebar() {
                                 side="top"
                                 className="w-[--radix-popper-anchor-width] min-w-56 bg-zinc-950 border-white/10 text-white"
                             >
-                                <DropdownMenuItem className="focus:bg-white/5 focus:text-white">
-                                    <Settings className="mr-2 h-4 w-4" />
-                                    <span>Настройки</span>
+                                <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white">
+                                    <Link href="/settings">
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        <span>Настройки</span>
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     className="text-red-400 focus:bg-red-500/10 focus:text-red-400"

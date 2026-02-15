@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Folder, Clock, ArrowRight, MoreVertical } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
 import { CreateProjectButton } from "@/components/create-project-button";
 
 interface Project {
@@ -29,9 +30,9 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
                 <div className="mx-auto size-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6 ring-1 ring-white/10">
                     <Folder className="size-8 text-neutral-400" />
                 </div>
-                <h3 className="text-xl font-medium text-white mb-2">No projects yet</h3>
+                <h3 className="text-xl font-medium text-white mb-2">Нет проектов</h3>
                 <p className="text-neutral-400 mb-8 max-w-sm mx-auto">
-                    Create your first project to start building AI-powered applications.
+                    Создайте первый проект, чтобы начать разработку ИИ-приложений.
                 </p>
                 <CreateProjectButton />
             </motion.div>
@@ -63,12 +64,12 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
                             </h3>
 
                             <p className="text-sm text-neutral-500 line-clamp-2 mb-6 flex-1">
-                                {project.description || "No description provided."}
+                                {project.description || "Описание не добавлено."}
                             </p>
 
-                            <div className="flex items-center gap-2 text-xs text-neutral-600 font-medium pt-4 border-t border-white/5">
+                            <div className="flex items-center gap-2 text-xs text-neutral-500 font-medium pt-4 border-t border-white/5">
                                 <Clock className="size-3.5" />
-                                <span>Edited {formatDistanceToNow(new Date(project.updatedAt))} ago</span>
+                                <span>Изменён {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true, locale: ru })}</span>
                             </div>
                         </div>
                     </Link>

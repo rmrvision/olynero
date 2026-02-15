@@ -61,10 +61,26 @@ export default function ResourcesPage() {
                                 </div>
                                 <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
                                 <p className="text-neutral-400 mb-8 leading-relaxed">{item.description}</p>
-                                <Button variant="outline" className="rounded-full border-white/10 hover:bg-white/10 text-white">
-                                    {item.action}
-                                    <ArrowRight className="ml-2 size-4" />
-                                </Button>
+                                {item.action === "Читать доки" ? (
+                                    <Link href="/#features">
+                                        <Button variant="outline" className="rounded-full border-white/10 hover:bg-white/10 text-white w-full sm:w-auto">
+                                            {item.action}
+                                            <ArrowRight className="ml-2 size-4" />
+                                        </Button>
+                                    </Link>
+                                ) : item.action === "Связаться с поддержкой" ? (
+                                    <a href="mailto:support@olynero.ai">
+                                        <Button variant="outline" className="rounded-full border-white/10 hover:bg-white/10 text-white w-full sm:w-auto">
+                                            {item.action}
+                                            <ArrowRight className="ml-2 size-4" />
+                                        </Button>
+                                    </a>
+                                ) : (
+                                    <Button variant="outline" className="rounded-full border-white/10 hover:bg-white/10 text-white w-full sm:w-auto">
+                                        {item.action}
+                                        <ArrowRight className="ml-2 size-4" />
+                                    </Button>
+                                )}
                             </div>
                         ))}
                     </div>

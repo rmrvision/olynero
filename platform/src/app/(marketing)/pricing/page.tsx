@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
+import Link from "next/link"
 
 export default function PricingPage() {
     return (
@@ -22,7 +23,7 @@ export default function PricingPage() {
                         <li className="flex gap-2"><Check className="size-5 text-green-500" /> 1 Пользователь</li>
                         <li className="flex gap-2"><Check className="size-5 text-green-500" /> Поддержка сообщества</li>
                     </ul>
-                    <Button variant="outline" className="w-full rounded-full border-white/10 hover:bg-white/10 text-white">Начать бесплатно</Button>
+                    <Link href="/register"><Button variant="outline" className="w-full rounded-full border-white/10 hover:bg-white/10 text-white">Начать бесплатно</Button></Link>
                 </div>
 
                 {/* Pro Plan */}
@@ -37,7 +38,7 @@ export default function PricingPage() {
                         <li className="flex gap-2"><Check className="size-5 text-indigo-500" /> Приоритетная поддержка</li>
                         <li className="flex gap-2"><Check className="size-5 text-indigo-500" /> Расширенная аналитика</li>
                     </ul>
-                    <Button className="w-full rounded-full bg-white text-black hover:bg-neutral-200">Попробовать Про</Button>
+                    <Link href="/register"><Button className="w-full rounded-full bg-white text-black hover:bg-neutral-200">Попробовать Про</Button></Link>
                 </div>
 
                 {/* Enterprise Plan */}
@@ -52,7 +53,7 @@ export default function PricingPage() {
                         <li className="flex gap-2"><Check className="size-5 text-neutral-500" /> SSO и SAML</li>
                         <li className="flex gap-2"><Check className="size-5 text-neutral-500" /> Гарантия SLA</li>
                     </ul>
-                    <Button variant="outline" className="w-full rounded-full border-white/10 hover:bg-white/10 text-white">Связаться с отделом продаж</Button>
+                    <a href="mailto:sales@olynero.ai"><Button variant="outline" className="w-full rounded-full border-white/10 hover:bg-white/10 text-white">Связаться с отделом продаж</Button></a>
                 </div>
             </div>
         </div>
