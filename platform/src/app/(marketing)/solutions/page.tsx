@@ -3,23 +3,23 @@ import { Bot, LineChart, MessageSquareText, PenTool } from "lucide-react"
 export default function SolutionsPage() {
     const solutions = [
         {
-            title: "Customer Support Agents",
-            description: "Automate 80% of your support tickets with intelligent agents that learn from your documentation.",
+            title: "Агенты поддержки",
+            description: "Автоматизируйте 80% тикетов поддержки с помощью интеллектуальных агентов, которые обучаются на вашей документации.",
             icon: MessageSquareText
         },
         {
-            title: "Content Generation",
-            description: "Generate high-quality blog posts, social media captions, and marketing copy in seconds.",
+            title: "Генерация контента",
+            description: "Создавайте качественные статьи для блога, посты для соцсетей и рекламные тексты за секунды.",
             icon: PenTool
         },
         {
-            title: "Data Analysis",
-            description: "Turn raw data into actionable insights. Ask questions about your CSVs and SQL databases in plain English.",
+            title: "Анализ данных",
+            description: "Превращайте сырые данные в инсайты. Задавайте вопросы к вашим CSV и SQL базам данных на естественном языке.",
             icon: LineChart
         },
         {
-            title: "Coding Assistants",
-            description: "Build custom coding assistants trained on your internal codebase and style guides.",
+            title: "Кодинг-ассистенты",
+            description: "Создавайте кастомных помощников по коду, обученных на вашей внутренней кодовой базе и стайл-гайдах.",
             icon: Bot
         }
     ]
@@ -27,8 +27,8 @@ export default function SolutionsPage() {
     return (
         <div className="container py-24 md:py-32">
             <div className="text-center mb-20">
-                <h1 className="text-4xl font-bold mb-6">Solutions for every team</h1>
-                <p className="text-xl text-neutral-400">Transform your workflow with purpose-built AI agents.</p>
+                <h1 className="text-4xl font-bold mb-6">Решения для каждой команды</h1>
+                <p className="text-xl text-neutral-400">Трансформируйте рабочий процесс с помощью специализированных ИИ-агентов.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">

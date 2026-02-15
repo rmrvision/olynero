@@ -19,17 +19,17 @@ import { Button } from "@/components/ui/button"
 // Menu items.
 const items = [
     {
-        title: "Project Alpha",
+        title: "Проект Альфа",
         url: "#",
         icon: MessageSquare,
     },
     {
-        title: "Marketing Copy",
+        title: "Маркетинг Копия",
         url: "#",
         icon: MessageSquare,
     },
     {
-        title: "React Component",
+        title: "React Компонент",
         url: "#",
         icon: MessageSquare,
     },
@@ -45,12 +45,12 @@ export function AppSidebar() {
                 </div>
                 <Button className="w-full justify-start gap-2" variant="outline">
                     <Plus className="size-4" />
-                    New Chat
+                    Новый чат
                 </Button>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Recents</SidebarGroupLabel>
+                    <SidebarGroupLabel>Недавние</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
@@ -73,7 +73,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild>
                             <a href="/settings">
                                 <Settings />
-                                <span>Settings</span>
+                                <span className="text-sm">Настройки</span>
                             </a>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

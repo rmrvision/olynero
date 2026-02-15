@@ -12,29 +12,29 @@ export default function LandingPage() {
                 <div className="container relative z-10 flex flex-col items-center text-center">
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm text-neutral-300 backdrop-blur-md mb-8 transition-colors hover:bg-white/10">
                         <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                        Olynero v2.0 is now live
+                        Olynero v2.0 уже доступна
                     </div>
 
                     <h1 className="text-5xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60 sm:text-7xl md:text-8xl max-w-4xl mb-6">
-                        Build AI Apps <br />
-                        <span className="text-white">At Warp Speed.</span>
+                        Создавайте ИИ-приложения <br />
+                        <span className="text-white">Со Скоростью Света.</span>
                     </h1>
 
                     <p className="max-w-2xl text-lg text-neutral-400 mb-10 leading-relaxed md:text-xl">
-                        The all-in-one platform for developing, testing, and deploying advanced AI agents.
-                        Experience the future of coding with Olynero.
+                        Единая платформа для разработки, тестирования и развертывания передовых ИИ-агентов.
+                        Почувствуйте будущее программирования с Olynero.
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         <Link href="/register">
                             <Button size="lg" className="h-12 px-8 text-base bg-white text-black hover:bg-white/90 rounded-full font-semibold">
-                                Start Building Free
+                                Начать бесплатно
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </Link>
-                        <Link href="#features">
+                        <Link href="/#features">
                             <Button variant="outline" size="lg" className="h-12 px-8 text-base border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white rounded-full">
-                                View Documentation
+                                Документация
                             </Button>
                         </Link>
                     </div>
@@ -48,7 +48,7 @@ export default function LandingPage() {
                             <div className="absolute inset-0 bg-[grid-template-columns:repeat(20,minmax(0,1fr))] opacity-20 pointer-events-none" style={{ backgroundImage: 'linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
                             <div className="text-neutral-500 font-mono text-sm flex flex-col items-center gap-4">
                                 <Bot className="size-16 text-neutral-700 group-hover:text-indigo-500 transition-colors duration-500" />
-                                <span>Interactive AI Interface Preview</span>
+                                <span>Интерактивный Интерфейс ИИ</span>
                             </div>
                         </div>
                     </div>
@@ -58,7 +58,7 @@ export default function LandingPage() {
             {/* Social Proof */}
             <section className="w-full py-12 border-y border-white/5 bg-white/[0.02]">
                 <div className="container">
-                    <p className="text-center text-sm font-medium text-neutral-500 mb-8 uppercase tracking-widest">Trusted by engineering teams at</p>
+                    <p className="text-center text-sm font-medium text-neutral-500 mb-8 uppercase tracking-widest">Используется инженерными командами в</p>
                     <div className="flex flex-wrap justify-center gap-12 md:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
                         {/* Mock Logos */}
                         <div className="flex items-center gap-2 font-bold text-xl text-white"><Globe className="size-6" /> Acme Corp</div>
@@ -74,8 +74,8 @@ export default function LandingPage() {
             <section id="features" className="w-full py-32 relative">
                 <div className="container">
                     <div className="text-center max-w-2xl mx-auto mb-20">
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">Everything you need to ship AI.</h2>
-                        <p className="text-neutral-400 text-lg">From zero to production in minutes. Olynero provides the primitive blocks for the next generation of software.</p>
+                        <h2 className="text-3xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">Всё необходимое для запуска ИИ.</h2>
+                        <p className="text-neutral-400 text-lg">От идеи до продакшена за минуты. Olynero предоставляет примитивы для создания программного обеспечения нового поколения.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -88,8 +88,8 @@ export default function LandingPage() {
                                 <div className="size-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 mb-6 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
                                     <Sparkles className="size-6" />
                                 </div>
-                                <h3 className="text-2xl font-semibold mb-3">AI-Powered Code Generation</h3>
-                                <p className="text-neutral-400 max-w-sm">Use our advanced models to generate React components, API routes, and database schemas instantly. Edit in real-time.</p>
+                                <h3 className="text-2xl font-semibold mb-3">Генерация кода с помощью ИИ</h3>
+                                <p className="text-neutral-400 max-w-sm">Используйте наши передовые модели для мгновенной генерации React-компонентов, API-маршрутов и схем баз данных. Редактируйте в реальном времени.</p>
                             </div>
                         </div>
 
@@ -99,8 +99,8 @@ export default function LandingPage() {
                                 <div className="size-12 rounded-xl bg-pink-500/20 flex items-center justify-center text-pink-400 mb-6 group-hover:bg-pink-500 group-hover:text-white transition-colors">
                                     <Zap className="size-6" />
                                 </div>
-                                <h3 className="text-2xl font-semibold mb-3">Instant Deploy</h3>
-                                <p className="text-neutral-400">Deploy your applications to the edge with a single click. Global low-latency.</p>
+                                <h3 className="text-2xl font-semibold mb-3">Мгновенный деплой</h3>
+                                <p className="text-neutral-400">Развертывание приложений на edge-серверах в один клик. Глобальная сеть с низкой задержкой.</p>
                             </div>
                         </div>
 
@@ -110,8 +110,8 @@ export default function LandingPage() {
                                 <div className="size-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mb-6 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                                     <Shield className="size-6" />
                                 </div>
-                                <h3 className="text-2xl font-semibold mb-3">Enterprise Security</h3>
-                                <p className="text-neutral-400">SOC2 compliant infrastructure with role-based access control included.</p>
+                                <h3 className="text-2xl font-semibold mb-3">Корпоративная безопасность</h3>
+                                <p className="text-neutral-400">Инфраструктура, соответствующая SOC2, с включенным управлением доступом на основе ролей (RBAC).</p>
                             </div>
                         </div>
 
@@ -121,8 +121,8 @@ export default function LandingPage() {
                                 <div className="size-12 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400 mb-6 group-hover:bg-green-500 group-hover:text-white transition-colors">
                                     <Bot className="size-6" />
                                 </div>
-                                <h3 className="text-2xl font-semibold mb-3">Custom Agent Orchestration</h3>
-                                <p className="text-neutral-400 max-w-sm">Chain multiple AI agents together to solve complex tasks. Use our visual builder to design workflows.</p>
+                                <h3 className="text-2xl font-semibold mb-3">Оркестрация пользовательских агентов</h3>
+                                <p className="text-neutral-400 max-w-sm">Связывайте несколько ИИ-агентов для решения сложных задач. Используйте визуальный редактор для проектирования рабочих процессов.</p>
                             </div>
                         </div>
                     </div>
@@ -133,11 +133,11 @@ export default function LandingPage() {
             <section className="w-full py-40 border-t border-white/10 relative overflow-hidden">
                 <div className="absolute inset-0 bg-indigo-950/20" />
                 <div className="container relative z-10 text-center">
-                    <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">Ready to build the future?</h2>
-                    <p className="text-neutral-400 text-xl max-w-2xl mx-auto mb-10">Join thousands of developers building the next generation of AI applications with Olynero.</p>
+                    <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight">Готовы строить будущее?</h2>
+                    <p className="text-neutral-400 text-xl max-w-2xl mx-auto mb-10">Присоединяйтесь к тысячам разработчиков, создающих ИИ-приложения следующего поколения с Olynero.</p>
                     <Link href="/register">
                         <Button size="lg" className="h-14 px-10 text-lg bg-white text-black hover:bg-white/90 rounded-full font-bold shadow-2xl shadow-indigo-500/20">
-                            Get Started for Free
+                            Начать бесплатно
                         </Button>
                     </Link>
                 </div>

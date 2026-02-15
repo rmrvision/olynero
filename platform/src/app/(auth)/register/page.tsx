@@ -25,41 +25,41 @@ export default function RegisterPage() {
         // Simulate registration delay
         setTimeout(() => {
             setIsLoading(false)
-            toast.success("Account created successfully!")
+            toast.success("Аккаунт успешно создан!")
         }, 1000)
     }
 
     return (
         <Card className="w-full max-w-sm">
             <CardHeader>
-                <CardTitle className="text-2xl">Register</CardTitle>
+                <CardTitle className="text-2xl">Регистрация</CardTitle>
                 <CardDescription>
-                    Create an account to start building with Olynero AI.
+                    Создайте аккаунт, чтобы начать работу с Olynero AI.
                 </CardDescription>
             </CardHeader>
             <form onSubmit={onSubmit}>
                 <CardContent className="grid gap-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="name">Full Name</Label>
-                        <Input id="name" placeholder="John Doe" required />
+                        <Label htmlFor="name">Полное имя</Label>
+                        <Input id="name" placeholder="Иван Иванов" required />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
                         <Input id="email" type="email" placeholder="m@example.com" required />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">Пароль</Label>
                         <Input id="password" type="password" required />
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
                     <Button className="w-full" disabled={isLoading}>
-                        {isLoading ? "Creating account..." : "Create account"}
+                        {isLoading ? "Создание аккаунта..." : "Создать аккаунт"}
                     </Button>
                     <div className="text-center text-sm text-muted-foreground">
-                        Already have an account?{" "}
+                        Уже есть аккаунт?{" "}
                         <Link href="/login" className="underline hover:text-primary">
-                            Sign in
+                            Войти
                         </Link>
                     </div>
                 </CardFooter>

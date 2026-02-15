@@ -9,11 +9,11 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 
 const navigation = [
-    { name: "Features", href: "/#features" },
-    { name: "Solutions", href: "/solutions" },
-    { name: "Pricing", href: "/pricing" },
-    { name: "Resources", href: "/resources" },
-    { name: "About", href: "/about" },
+    { name: "Функции", href: "/#features" },
+    { name: "Решения", href: "/solutions" },
+    { name: "Тарифы", href: "/pricing" },
+    { name: "Ресурсы", href: "/resources" },
+    { name: "О нас", href: "/about" },
 ]
 
 export function SiteHeader() {
@@ -89,10 +89,10 @@ export function SiteHeader() {
                     </div>
                     <nav className="flex items-center space-x-2">
                         <Link href="/login">
-                            <Button variant="ghost" className="text-white hover:text-white/80 hover:bg-white/10">Log in</Button>
+                            <Button variant="ghost" className="text-white hover:text-white/80 hover:bg-white/10">Войти</Button>
                         </Link>
                         <Link href="/register">
-                            <Button className="bg-white text-black hover:bg-white/90">Get Started</Button>
+                            <Button className="bg-white text-black hover:bg-white/90">Начать</Button>
                         </Link>
                     </nav>
                 </div>

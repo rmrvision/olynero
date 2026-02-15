@@ -15,7 +15,7 @@ type Message = {
 
 export default function ChatPage() {
     const [messages, setMessages] = useState<Message[]>([
-        { role: "assistant", content: "Hello! I am Olynero AI. How can I help you build your next big idea today?" }
+        { role: "assistant", content: "Привет! Я Olynero AI. Что мы будем создавать сегодня?" }
     ]);
     const [input, setInput] = useState("");
 
@@ -37,16 +37,16 @@ export default function ChatPage() {
             setMessages(prev => [...prev, { role: "assistant", content: responseContent }]);
         },
         onError: (error) => {
-            toast.error("Agent failed: " + error.message);
-            setMessages(prev => [...prev, { role: "assistant", content: "Sorry, something went wrong. Please try again." }]);
+            toast.error("Ошибка агента: " + error.message);
+            setMessages(prev => [...prev, { role: "assistant", content: "Извините, что-то пошло не так. Пожалуйста, попробуйте еще раз." }]);
         }
     });
 
     const processResponse = (data: any) => {
         if (data.artifacts && data.artifacts.length > 0) {
-            return "I've generated some code for you. Check the artifacts panel (coming soon)!";
+            return "Я сгенерировал код для вас. Проверьте панель артефактов (скоро)!";
         }
-        return data.message || "Task completed.";
+        return data.message || "Задача выполнена.";
     }
 
     const handleSend = () => {
@@ -96,7 +96,7 @@ export default function ChatPage() {
                         </div>
                         <div className="bg-muted/50 border text-foreground rounded-2xl rounded-bl-none px-5 py-3 flex items-center gap-2">
                             <Sparkles className="size-4 animate-pulse text-primary" />
-                            <span className="text-sm text-muted-foreground">Thinking...</span>
+                            <span className="text-sm text-muted-foreground">Думаю...</span>
                         </div>
                     </div>
                 )}
@@ -107,7 +107,7 @@ export default function ChatPage() {
                 <div className="max-w-3xl mx-auto relative cursor-text rounded-3xl border bg-muted/30 shadow-sm transition-all focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary">
                     <Input
                         className="border-none shadow-none bg-transparent h-14 pl-6 pr-14 focus-visible:ring-0 text-base placeholder:text-muted-foreground/60"
-                        placeholder="Message Olynero..."
+                        placeholder="Сообщение Olynero..."
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && !isPending && handleSend()}
@@ -127,7 +127,7 @@ export default function ChatPage() {
                 </div>
                 <div className="text-center mt-3">
                     <span className="text-xs text-muted-foreground/60 flex items-center justify-center gap-1">
-                        <Sparkles className="size-3" /> AI can make mistakes. Please review generated code.
+                        <Sparkles className="size-3" /> ИИ может ошибаться. Пожалуйста, проверяйте результат.
                     </span>
                 </div>
             </div>

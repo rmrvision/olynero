@@ -25,7 +25,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             </BreadcrumbItem>
                             <BreadcrumbSeparator className="hidden md:block" />
                             <BreadcrumbItem>
-                                <BreadcrumbPage>New Chat</BreadcrumbPage>
+                                <BreadcrumbPage>Новый чат</BreadcrumbPage>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>

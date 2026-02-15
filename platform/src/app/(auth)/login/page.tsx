@@ -25,7 +25,7 @@ export default function LoginPage() {
         // Simulate login delay
         setTimeout(() => {
             setIsLoading(false)
-            toast.success("Logged in successfully!")
+            toast.success("Вы успешно вошли!")
             // In a real app, redirection happens here
         }, 1000)
     }
@@ -33,9 +33,9 @@ export default function LoginPage() {
     return (
         <Card className="w-full max-w-sm">
             <CardHeader>
-                <CardTitle className="text-2xl">Login</CardTitle>
+                <CardTitle className="text-2xl">Вход</CardTitle>
                 <CardDescription>
-                    Enter your email below to login to your account.
+                    Введите ваш email для входа в аккаунт.
                 </CardDescription>
             </CardHeader>
             <form onSubmit={onSubmit}>
@@ -45,18 +45,18 @@ export default function LoginPage() {
                         <Input id="email" type="email" placeholder="m@example.com" required />
                     </div>
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">Пароль</Label>
                         <Input id="password" type="password" required />
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
                     <Button className="w-full" disabled={isLoading}>
-                        {isLoading ? "Signing in..." : "Sign in"}
+                        {isLoading ? "Вход..." : "Войти"}
                     </Button>
                     <div className="text-center text-sm text-muted-foreground">
-                        Don&apos;t have an account?{" "}
+                        Нет аккаунта?{" "}
                         <Link href="/register" className="underline hover:text-primary">
-                            Sign up
+                            Зарегистрироваться
                         </Link>
                     </div>
                 </CardFooter>
