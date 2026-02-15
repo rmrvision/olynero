@@ -54,7 +54,7 @@ export function AdminSidebar() {
                                     : pathname.startsWith(item.href)
                                 return (
                                     <SidebarMenuItem key={item.href}>
-                                        <SidebarMenuButton asChild isActive={isActive}>
+                                        <SidebarMenuButton asChild isActive={isActive} className="text-neutral-400 hover:bg-white/5 hover:text-white data-[active=true]:bg-white/5 data-[active=true]:text-white">
                                             <Link href={item.href}>
                                                 <item.icon />
                                                 <span>{item.title}</span>
@@ -70,7 +70,7 @@ export function AdminSidebar() {
             <SidebarFooter className="border-t border-white/5 p-4">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton asChild className="text-neutral-400 hover:bg-white/5 hover:text-white">
                             <Link href="/dashboard">
                                 <ArrowLeft />
                                 <span className="text-sm">Вернуться в приложение</span>

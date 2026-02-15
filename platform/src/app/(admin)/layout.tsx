@@ -1,5 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AdminSidebar } from "@/components/admin-sidebar"
+import { AdminBreadcrumb } from "@/components/admin-breadcrumb"
 import { Separator } from "@/components/ui/separator"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -11,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <header className="flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-zinc-950/50 backdrop-blur-xl px-4">
                     <SidebarTrigger className="-ml-1 text-neutral-400 hover:text-white" />
                     <Separator orientation="vertical" className="mr-2 h-4 bg-white/10" />
-                    <span className="text-sm font-medium text-neutral-400">Панель администратора</span>
+                    <AdminBreadcrumb />
                 </header>
                 <div className="flex-1 overflow-auto bg-zinc-950">
                     {children}

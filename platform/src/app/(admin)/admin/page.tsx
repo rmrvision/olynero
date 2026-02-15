@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { Users, UserCheck } from "lucide-react";
+import Link from "next/link";
 
 async function getStats() {
     // Only fetch user stats for now
@@ -32,10 +33,13 @@ export default async function AdminDashboard() {
     ];
 
     return (
-        <div className="p-8 text-white">
-            <h1 className="text-3xl font-bold mb-8 text-white">Панель управления</h1>
+        <div className="p-6 md:p-8 text-white max-w-[1600px] mx-auto">
+            <div className="mb-10">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Панель управления</h1>
+                <p className="text-neutral-400">Обзор платформы и статистика</p>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 {statCards.map((stat, index) => (
                     <div key={index} className="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors">
                         <div className="flex items-center justify-between mb-4">
@@ -54,23 +58,26 @@ export default async function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Recent Users */}
                 <div className="p-6 rounded-2xl border border-white/10 bg-white/5 hover:border-white/20 transition-colors">
-                    <h3 className="text-xl font-bold mb-6">Новые пользователи</h3>
-                    <div className="space-y-4">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-white">Новые пользователи</h3>
+                        <Link href="/admin/users" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">Все →</Link>
+                    </div>
+                    <div className="space-y-3">
                         {stats.recentUsers.map((user: any) => (
-                            <div key={user.id} className="flex items-center justify-between p-4 rounded-xl bg-white/5">
+                            <Link key={user.id} href={`/admin/users/${user.id}`} className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all group">
                                 <div className="flex items-center gap-3">
-                                    <div className="size-10 rounded-full bg-neutral-800 flex items-center justify-center font-bold">
-                                        {user.name?.[0] || "U"}
+                                    <div className="size-10 rounded-full bg-neutral-800 flex items-center justify-center font-bold text-neutral-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
+                                        {user.name?.[0] || "?"}
                                     </div>
                                     <div>
-                                        <p className="font-medium">{user.name || "User"}</p>
+                                        <p className="font-medium text-white">{user.name || "Без имени"}</p>
                                         <p className="text-xs text-neutral-400">{user.email}</p>
                                     </div>
                                 </div>
                                 <span className="text-xs text-neutral-500">
-                                    {new Date(user.createdAt).toLocaleDateString()}
+                                    {new Date(user.createdAt).toLocaleDateString("ru-RU")}
                                 </span>
-                            </div>
+                            </Link>
                         ))}
                         {stats.recentUsers.length === 0 && (
                             <p className="text-neutral-500 text-center py-4">Нет пользователей</p>

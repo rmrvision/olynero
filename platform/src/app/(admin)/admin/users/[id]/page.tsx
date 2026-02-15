@@ -99,23 +99,23 @@ export default function AdminUserDetailPage() {
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline">
+                        <Button variant="outline" className="border-white/10 text-white hover:bg-white/10 hover:text-white">
                             Действия <MoreHorizontal className="ml-2 size-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={toggleRole}>
+                    <DropdownMenuContent align="end" className="min-w-48 bg-zinc-950 border-white/10 text-white">
+                        <DropdownMenuItem onClick={toggleRole} className="focus:bg-white/5 focus:text-white cursor-pointer">
                             <Shield className="mr-2 size-4" />
                             {user.role === "ADMIN" ? "Убрать роль админа" : "Сделать админом"}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={toggleActive}>
+                        <DropdownMenuItem onClick={toggleActive} className="focus:bg-white/5 focus:text-white cursor-pointer">
                             {user.isActive ? (
                                 <><UserX className="mr-2 size-4" /> Заблокировать</>
                             ) : (
                                 <><UserCheck className="mr-2 size-4" /> Разблокировать</>
                             )}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={deleteUser} className="text-destructive">
+                        <DropdownMenuItem onClick={deleteUser} className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer">
                             <Trash2 className="mr-2 size-4" /> Удалить пользователя
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -125,8 +125,8 @@ export default function AdminUserDetailPage() {
             {/* Info Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="rounded-xl border border-white/10 bg-white/5 p-4 flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <Shield className="size-4 text-primary" />
+                    <div className="size-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                        <Shield className="size-4 text-indigo-400" />
                     </div>
                     <div>
                         <p className="text-xs text-neutral-400">Роль</p>
@@ -166,26 +166,26 @@ export default function AdminUserDetailPage() {
                 </div>
             </div>
 
-            <Separator />
+            <Separator className="bg-white/10" />
 
             {/* User Chats */}
             <div>
-                <h2 className="font-semibold mb-4">Чаты пользователя ({user.chats.length})</h2>
+                <h2 className="font-semibold mb-4 text-white">Чаты пользователя ({user.chats.length})</h2>
                 {user.chats.length === 0 ? (
                     <p className="text-sm text-neutral-400 py-8 text-center border border-white/10 rounded-xl bg-white/5">У этого пользователя нет чатов.</p>
                 ) : (
-                    <div className="rounded-xl border border-white/10 bg-white/5">
+                    <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead className="pl-4">Название</TableHead>
-                                    <TableHead>Сообщений</TableHead>
-                                    <TableHead>Создан</TableHead>
+                                <TableRow className="border-white/5 hover:bg-transparent">
+                                    <TableHead className="pl-4 text-neutral-400 font-medium">Название</TableHead>
+                                    <TableHead className="text-neutral-400 font-medium">Сообщений</TableHead>
+                                    <TableHead className="text-neutral-400 font-medium">Создан</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {user.chats.map((chat) => (
-                                    <TableRow key={chat.id}>
+                                    <TableRow key={chat.id} className="border-white/5 hover:bg-white/5">
                                         <TableCell className="pl-4">
                                             <Link href={`/admin/chats/${chat.id}`} className="font-medium hover:underline">
                                                 {chat.title}
