@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { AgentState, AgentRole, Message, Tool, ToolCall } from './types';
+import { DASHBOARD_TEMPLATE, LANDING_PAGE_TEMPLATE } from './templates';
 
 export class Agent {
     private state: AgentState;
@@ -120,8 +121,8 @@ export class Agent {
                 plan.push({
                     id: '1',
                     description: mission.includes('dashboard') ? 'Create Dashboard Layout' : 'Create Landing Page',
-                    status: 'pending',
-                    role: 'DEVELOPER'
+                    status: 'pending' as const,
+                    role: 'DEVELOPER' as AgentRole
                 });
             } else if (mission.includes('change') || mission.includes('update') || mission.includes('fix')) {
                 // INTENT: EDIT EXISTING PROJECT
@@ -129,16 +130,16 @@ export class Agent {
                 plan.push({
                     id: '1',
                     description: `Update App.tsx: ${this.state.mission}`,
-                    status: 'pending',
-                    role: 'DEVELOPER'
+                    status: 'pending' as const,
+                    role: 'DEVELOPER' as AgentRole
                 });
             } else {
                 // DEFAULT
                 plan.push({
                     id: '1',
                     description: 'Create App.tsx',
-                    status: 'pending',
-                    role: 'DEVELOPER'
+                    status: 'pending' as const,
+                    role: 'DEVELOPER' as AgentRole
                 });
             }
 
@@ -175,50 +176,12 @@ export class Agent {
 
                 console.log(`[Developer] Edited ${targetFile}`);
 
-            } else {
                 // --- CREATE LOGIC ---
                 if (stepDescription.includes("Dashboard")) {
-                    content = `import React from 'react';
-import { Button } from '@/components/ui/button';
-
-export default function App() {
-  return (
-    <div className="flex h-screen bg-slate-100">
-      <div className="w-64 bg-slate-900 text-white p-4">
-        <h1 className="text-xl font-bold mb-4">Dashboard</h1>
-        <nav className="flex flex-col gap-2">
-            <Button variant="ghost" className="justify-start">Home</Button>
-            <Button variant="ghost" className="justify-start">Settings</Button>
-        </nav>
-      </div>
-      <div className="flex-1 p-8">
-        <h2 className="text-2xl font-bold">Welcome User</h2>
-        <div className="mt-4 grid grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded shadow">Stat 1</div>
-            <div className="bg-white p-4 rounded shadow">Stat 2</div>
-            <div className="bg-white p-4 rounded shadow">Stat 3</div>
-        </div>
-      </div>
-    </div>
-  );
-}`;
+                    content = DASHBOARD_TEMPLATE;
                 } else {
                     // Default Landing Page
-                    content = `import React from 'react';
-import { Button } from '@/components/ui/button';
-
-export default function App() {
-  return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-4">Welcome to Olynero</h1>
-      <p className="text-lg text-slate-600 mb-8">Building the future of AI coding.</p>
-      <div className="flex gap-4">
-        <Button>Get Started</Button>
-        <Button variant="outline">Learn More</Button>
-      </div>
-    </div>
-  );
-}`;
+                    content = LANDING_PAGE_TEMPLATE;
                 }
                 console.log(`[Developer] Created ${targetFile}`);
             }
