@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Twitter, Linkedin, Github } from "lucide-react"
 
 export function SiteFooter() {
     return (
@@ -13,10 +14,16 @@ export function SiteFooter() {
                         Расширяем возможности нового поколения создателей с помощью передовых ИИ-инструментов.
                         Проектируйте, кодируйте и развертывайте быстрее, чем когда-либо.
                     </p>
-                    <div className="flex gap-4">
-                        <div className="size-8 bg-neutral-800 hover:bg-neutral-700 transition-colors rounded-full flex items-center justify-center text-xs cursor-pointer">X</div>
-                        <div className="size-8 bg-neutral-800 hover:bg-neutral-700 transition-colors rounded-full flex items-center justify-center text-xs cursor-pointer">In</div>
-                        <div className="size-8 bg-neutral-800 hover:bg-neutral-700 transition-colors rounded-full flex items-center justify-center text-xs cursor-pointer">Gh</div>
+                    <div className="flex gap-3">
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="size-9 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-neutral-400 hover:text-white transition-colors" aria-label="Twitter">
+                            <Twitter className="size-4" />
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="size-9 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-neutral-400 hover:text-white transition-colors" aria-label="LinkedIn">
+                            <Linkedin className="size-4" />
+                        </a>
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="size-9 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-neutral-400 hover:text-white transition-colors" aria-label="GitHub">
+                            <Github className="size-4" />
+                        </a>
                     </div>
                 </div>
 

@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { login } from "@/actions/auth-actions"
 import { useRouter } from "next/navigation"
 import { GithubLoginButton } from "@/components/github-login-button"
+import { Mail, Lock } from "lucide-react"
 
 export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false)
@@ -41,7 +42,9 @@ export default function LoginPage() {
 
             <form onSubmit={onSubmit} className="space-y-5">
                 <div className="space-y-2">
-                    <Label htmlFor="email" className="text-neutral-300">Email</Label>
+                    <Label htmlFor="email" className="text-neutral-300 flex items-center gap-2">
+                        <Mail className="size-3.5" /> Email
+                    </Label>
                     <Input
                         name="email"
                         id="email"
@@ -52,7 +55,9 @@ export default function LoginPage() {
                     />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="password" className="text-neutral-300">Пароль</Label>
+                    <Label htmlFor="password" className="text-neutral-300 flex items-center gap-2">
+                        <Lock className="size-3.5" /> Пароль
+                    </Label>
                     <Input
                         name="password"
                         id="password"

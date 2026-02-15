@@ -27,13 +27,14 @@ export default function LandingPage() {
 
                     <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         <Link href="/register">
-                            <Button size="lg" className="h-12 px-8 text-base bg-white text-black hover:bg-white/90 rounded-full font-semibold">
+                            <Button size="lg" className="h-12 px-8 text-base bg-white text-black hover:bg-white/90 rounded-full font-semibold group">
                                 Начать бесплатно
-                                <ArrowRight className="ml-2 h-4 w-4" />
+                                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
                             </Button>
                         </Link>
                         <Link href="/resources">
                             <Button variant="outline" size="lg" className="h-12 px-8 text-base border-white/10 bg-white/5 text-white hover:bg-white/10 hover:text-white rounded-full">
+                                <Bot className="mr-2 h-4 w-4" />
                                 Ресурсы и документация
                             </Button>
                         </Link>

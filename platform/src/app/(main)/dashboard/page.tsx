@@ -3,7 +3,7 @@ import { getUserProjects } from "@/lib/projects";
 import { redirect } from "next/navigation";
 import { ProjectGrid } from "@/components/dashboard/project-grid";
 import { CreateProjectButton } from "@/components/create-project-button";
-import { Sparkles } from "lucide-react";
+import { Sparkles, FolderPlus } from "lucide-react";
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -19,7 +19,7 @@ export default async function DashboardPage() {
                 <div className="space-y-4">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-medium text-indigo-400">
                         <Sparkles className="size-3" />
-                        <span>AI-Native Workspace</span>
+                        <span>Рабочая область с ИИ</span>
                     </div>
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
@@ -48,12 +48,12 @@ export default async function DashboardPage() {
                 {projects.length > 0 ? (
                     <ProjectGrid projects={projects} />
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-dashed border-white/10 bg-white/5">
-                        <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center mb-4">
-                            <Sparkles className="h-6 w-6 text-neutral-500" />
+                    <div className="flex flex-col items-center justify-center py-24 rounded-2xl border border-dashed border-white/10 bg-white/5 hover:border-white/20 transition-colors">
+                        <div className="h-16 w-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mb-6">
+                            <FolderPlus className="h-8 w-8 text-indigo-400" />
                         </div>
-                        <h3 className="text-lg font-medium text-white mb-1">Нет проектов</h3>
-                        <p className="text-neutral-400 mb-6">Создайте свой первый проект, чтобы начать работу</p>
+                        <h3 className="text-xl font-semibold text-white mb-2">Нет проектов</h3>
+                        <p className="text-neutral-400 mb-8 text-center max-w-sm">Создайте первый проект и начните разрабатывать ИИ-приложения с помощью встроенного ассистента</p>
                         <CreateProjectButton />
                     </div>
                 )}

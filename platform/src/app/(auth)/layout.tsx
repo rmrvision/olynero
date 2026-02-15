@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Sparkles, Code2, Shield } from "lucide-react"
 
 export default function AuthLayout({
     children,
@@ -20,6 +21,17 @@ export default function AuthLayout({
                 </div>
 
                 <div className="relative z-10 space-y-6">
+                    <div className="flex gap-3 mb-4">
+                        <div className="size-10 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                            <Sparkles className="size-5 text-indigo-400" />
+                        </div>
+                        <div className="size-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                            <Code2 className="size-5 text-purple-400" />
+                        </div>
+                        <div className="size-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
+                            <Shield className="size-5 text-emerald-400" />
+                        </div>
+                    </div>
                     <h2 className="text-4xl font-bold leading-tight">
                         Создавайте ИИ-приложения<br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">со скоростью света.</span>

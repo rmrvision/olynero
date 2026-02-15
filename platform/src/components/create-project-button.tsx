@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus } from "lucide-react";
+import { FolderPlus } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createProjectAction } from "@/actions/project-actions";
@@ -42,16 +42,16 @@ export function CreateProjectButton() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="bg-white text-black hover:bg-neutral-200">
-                    <Plus className="size-4 mr-2" />
+                <Button size="sm" className="bg-white text-black hover:bg-white/90 font-medium">
+                    <FolderPlus className="size-4 mr-2" />
                     Новый проект
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 text-white">
                 <DialogHeader>
-                    <DialogTitle>Создать проект</DialogTitle>
+                    <DialogTitle className="text-white">Создать проект</DialogTitle>
                     <DialogDescription className="text-neutral-400">
-                        Дайте имя вашему новому приложению.
+                        Введите название вашего нового ИИ-приложения.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -64,7 +64,7 @@ export function CreateProjectButton() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="bg-black/40 border-white/10 text-white placeholder:text-neutral-600 focus-visible:ring-indigo-500/50"
-                            placeholder="Например: Мой супер стартап"
+                            placeholder="Например: Чат-бот для поддержки"
                             autoComplete="off"
                         />
                     </div>

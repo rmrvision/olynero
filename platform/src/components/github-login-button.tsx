@@ -21,7 +21,7 @@ export function GithubLoginButton() {
             disabled={isLoading}
         >
             <Github className="mr-2 h-4 w-4" />
-            {isLoading ? "Connecting..." : "Continue with GitHub"}
+            {isLoading ? "Подключение..." : "Войти через GitHub"}
         </Button>
     );
 }

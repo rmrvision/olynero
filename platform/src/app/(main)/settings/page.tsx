@@ -1,9 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { signOut } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Key, AlertTriangle, Loader2 } from "lucide-react";
+import { User, Key, AlertTriangle, Loader2, LogOut } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -24,8 +25,8 @@ export default function SettingsPage() {
     return (
         <div className="p-6 md:p-10 max-w-4xl mx-auto overflow-y-auto h-full text-white">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">Настройки</h1>
-                <p className="text-neutral-400">Управление профилем и предпочтениями аккаунта.</p>
+                <h1 className="text-3xl font-bold mb-2 text-white">Настройки</h1>
+                <p className="text-neutral-400">Управление профилем, API-ключами и настройками аккаунта.</p>
             </div>
 
             <div className="space-y-8">
@@ -90,6 +91,25 @@ export default function SettingsPage() {
                         <p className="text-sm text-neutral-400 mb-4">У вас пока нет активных API ключей.</p>
                         <Button variant="outline" size="sm" className="border-white/10 hover:bg-white/5 text-neutral-300 hover:text-white">
                             Создать новый ключ
+                        </Button>
+                    </div>
+                </section>
+
+                {/* Sign Out */}
+                <section className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl p-6 md:p-8">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="size-12 rounded-xl bg-neutral-500/10 border border-white/5 flex items-center justify-center">
+                                <LogOut className="size-6 text-neutral-400" />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-semibold text-white">Выйти из аккаунта</h2>
+                                <p className="text-sm text-neutral-400">Завершить текущую сессию</p>
+                            </div>
+                        </div>
+                        <Button variant="outline" onClick={() => signOut({ callbackUrl: "/" })} className="border-white/10 text-white hover:bg-white/10">
+                            <LogOut className="mr-2 size-4" />
+                            Выйти
                         </Button>
                     </div>
                 </section>

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu } from "lucide-react"
+import { Menu, Zap, Lightbulb, CreditCard, BookOpen, HelpCircle, Info } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 // import { User } from "next-auth" // Importing from next-auth in client component might be tricky if not careful with types, better to use any or define simple shape
@@ -19,12 +19,12 @@ interface SiteHeaderProps {
 }
 
 const navigation = [
-    { name: "Функции", href: "/#features" },
-    { name: "Решения", href: "/solutions" },
-    { name: "Тарифы", href: "/pricing" },
-    { name: "Ресурсы", href: "/resources" },
-    { name: "FAQ", href: "/faq" },
-    { name: "О нас", href: "/about" },
+    { name: "Функции", href: "/#features", icon: Zap },
+    { name: "Решения", href: "/solutions", icon: Lightbulb },
+    { name: "Тарифы", href: "/pricing", icon: CreditCard },
+    { name: "Ресурсы", href: "/resources", icon: BookOpen },
+    { name: "FAQ", href: "/faq", icon: HelpCircle },
+    { name: "О нас", href: "/about", icon: Info },
 ]
 
 export function SiteHeader({ user }: SiteHeaderProps) {
@@ -42,18 +42,23 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                         </span>
                     </Link>
                     <nav className="flex items-center space-x-6 text-sm font-medium">
-                        {navigation.map((item) => (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={cn(
-                                    "transition-colors hover:text-foreground/80 text-foreground/60",
-                                    pathname === item.href ? "text-foreground" : "text-foreground/60"
-                                )}
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
+                        {navigation.map((item) => {
+                            const isActive = pathname === item.href || (item.href === "/#features" && pathname === "/")
+                            const Icon = item.icon
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        "flex items-center gap-1.5 transition-colors hover:text-white",
+                                        isActive ? "text-white" : "text-neutral-400"
+                                    )}
+                                >
+                                    <Icon className="size-3.5 opacity-70" />
+                                    {item.name}
+                                </Link>
+                            )
+                        })}
                     </nav>
                 </div>
 
@@ -71,7 +76,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     <SheetContent side="left" className="pr-0 bg-black border-white/10 text-white">
                         <div className="px-7">
                             <Link
-                                href="/"
+                                href={user ? "/dashboard" : "/"}
                                 className="flex items-center"
                                 onClick={() => setIsOpen(false)}
                             >
@@ -79,17 +84,21 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                 <span className="font-bold">Olynero</span>
                             </Link>
                         </div>
-                        <div className="flex flex-col gap-4 py-4 px-7 mt-4">
-                            {navigation.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className="text-lg font-medium text-white/70 hover:text-white transition-colors"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    {item.name}
-                                </Link>
-                            ))}
+                        <div className="flex flex-col gap-2 py-4 px-7 mt-4">
+                            {navigation.map((item) => {
+                                const Icon = item.icon
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className="flex items-center gap-3 py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg px-3 -mx-1 transition-colors"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <Icon className="size-4 text-indigo-400" />
+                                        {item.name}
+                                    </Link>
+                                )
+                            })}
                         </div>
                     </SheetContent>
                 </Sheet>
@@ -101,7 +110,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     <nav className="flex items-center space-x-2">
                         {user ? (
                             <Link href="/dashboard">
-                                <Button className="bg-white text-black hover:bg-white/90">К консоли</Button>
+                                <Button size="sm" className="bg-white text-black hover:bg-white/90 font-medium">В консоль</Button>
                             </Link>
                         ) : (
                             <>

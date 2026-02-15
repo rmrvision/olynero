@@ -1,6 +1,6 @@
 "use client"
 
-import { Layers, Terminal, Settings, ChevronUp, User2, LayoutDashboard } from "lucide-react"
+import { Layers, Terminal, Settings, ChevronDown, User2, LayoutDashboard, LogOut } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -86,7 +86,7 @@ export function AppSidebar() {
                                         <span className="text-sm font-medium text-white truncate w-full">{session?.user?.name || "Пользователь"}</span>
                                         <span className="text-xs text-neutral-500 truncate w-full">{session?.user?.email || "user@olynero.ai"}</span>
                                     </div>
-                                    <ChevronUp className="ml-auto h-4 w-4 text-neutral-500" />
+                                    <ChevronDown className="ml-auto h-4 w-4 text-neutral-500" />
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
@@ -100,9 +100,10 @@ export function AppSidebar() {
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    className="text-red-400 focus:bg-red-500/10 focus:text-red-400"
+                                    className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
                                     onClick={() => signOut({ callbackUrl: "/login" })}
                                 >
+                                    <LogOut className="mr-2 h-4 w-4" />
                                     <span>Выйти</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
