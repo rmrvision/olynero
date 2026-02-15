@@ -100,3 +100,7 @@ export async function login(formData: FormData) {
         throw error;
     }
 }
+
+export async function loginWithGithub() {
+    await signIn("github", { redirectTo: "/dashboard" });
+}

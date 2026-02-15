@@ -8,6 +8,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { register } from "@/actions/auth-actions"
 import { useRouter } from "next/navigation"
+import { GithubLoginButton } from "@/components/github-login-button"
 
 export default function RegisterPage() {
     const [isLoading, setIsLoading] = useState(false)
@@ -87,6 +88,17 @@ export default function RegisterPage() {
                     {isLoading ? "Создание..." : "Создать аккаунт"}
                 </Button>
             </form>
+
+            <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/10" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-black px-2 text-neutral-500">Или</span>
+                </div>
+            </div>
+
+            <GithubLoginButton />
 
             <div className="mt-8 text-center text-sm text-neutral-500">
                 Уже есть аккаунт?{" "}
