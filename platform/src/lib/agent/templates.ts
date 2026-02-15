@@ -1,5 +1,5 @@
 
-export const LANDING_PAGE_TEMPLATE = \`import React from 'react';
+export const LANDING_PAGE_TEMPLATE = `import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Code2, Sparkles, Zap } from 'lucide-react';
@@ -63,9 +63,9 @@ export default function App() {
       </section>
     </div>
   );
-}\`;
+}`;
 
-export const DASHBOARD_TEMPLATE = \`import React, { useState } from 'react';
+export const DASHBOARD_TEMPLATE = `import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -196,4 +196,4 @@ export default function App() {
       </main>
     </div>
   );
-}\`;
+}`;
