@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     });
 
     // Simple directory structure
-    const fileStructure = filePaths.map(f => f.path).join("\n");
+    const fileStructure = filePaths.map((f: { path: string }) => f.path).join("\n");
 
     const systemPrompt = `
 You are an expert Full Stack React & Node.js Developer acting as the intelligence for a web-based IDE.
