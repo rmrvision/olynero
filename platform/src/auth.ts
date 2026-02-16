@@ -6,6 +6,10 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
+// GitHub: create an "OAuth App" (not "GitHub App") at https://github.com/settings/developers
+// Callback URL must be exactly: https://olynero.com/api/auth/callback/github (no trailing space)
+export const useGitHub = !!(process.env.GITHUB_ID && process.env.GITHUB_SECRET);
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
     ...authConfig,
     session: { strategy: 'jwt', maxAge: 30 * 24 * 60 * 60 },
@@ -30,15 +34,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 return null;
             },
         }),
-        GitHub({
-            clientId: process.env.GITHUB_ID,
-            clientSecret: process.env.GITHUB_SECRET,
-            authorization: {
-                params: {
-                    scope: 'read:user user:email repo',
-                },
-            },
-        }),
+        ...(useGitHub
+            ? [
+                  GitHub({
+                      clientId: process.env.GITHUB_ID!,
+                      clientSecret: process.env.GITHUB_SECRET!,
+                      authorization: {
+                          params: {
+                              scope: 'read:user user:email repo',
+                          },
+                      },
+                  }),
+              ]
+            : []),
     ],
     callbacks: {
         ...authConfig.callbacks,
