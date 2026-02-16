@@ -6,9 +6,21 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
-// Required for NextAuth v5; missing it causes 500 "server configuration" on callback
-if (!process.env.AUTH_SECRET && process.env.NODE_ENV === 'production') {
-    console.error('[Auth] AUTH_SECRET is not set. Set it in your deployment env (e.g. Vercel/Amplify).');
+// Validate critical environment variables
+if (!process.env.AUTH_SECRET) {
+    const env = process.env.NODE_ENV || 'development';
+    console.error(`[Auth] ⚠️  AUTH_SECRET is not set (env: ${env}). This will cause 500 errors on auth callbacks.`);
+    if (env === 'production') {
+        throw new Error('AUTH_SECRET must be set in production');
+    }
+} else {
+    console.log('[Auth] ✓ AUTH_SECRET is set');
+}
+
+if (process.env.AUTH_URL) {
+    console.log(`[Auth] ✓ AUTH_URL is set to: ${process.env.AUTH_URL}`);
+} else {
+    console.warn('[Auth] ⚠️  AUTH_URL is not set. NextAuth will try to detect it automatically.');
 }
 
 // GitHub: create an "OAuth App" (not "GitHub App") at https://github.com/settings/developers
@@ -22,23 +34,56 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         Credentials({
             async authorize(credentials) {
                 try {
+                    console.log('[Auth] Credentials authorize called');
+                    
                     const parsedCredentials = z
                         .object({ email: z.string().email(), password: z.string().min(6) })
                         .safeParse(credentials);
 
-                    if (parsedCredentials.success) {
-                        const { email, password } = parsedCredentials.data;
-
-                        const user = await db.user.findUnique({ where: { email } });
-                        if (!user || !user.password) return null;
-
-                        const passwordsMatch = await bcrypt.compare(password, user.password);
-                        if (passwordsMatch) return user;
+                    if (!parsedCredentials.success) {
+                        console.log('[Auth] Credentials validation failed:', parsedCredentials.error.format());
+                        return null;
                     }
 
-                    return null;
+                    const { email, password } = parsedCredentials.data;
+                    console.log(`[Auth] Attempting to find user with email: ${email}`);
+
+                    const user = await db.user.findUnique({ where: { email } });
+                    
+                    if (!user) {
+                        console.log(`[Auth] User not found for email: ${email}`);
+                        return null;
+                    }
+
+                    if (!user.password) {
+                        console.log(`[Auth] User found but has no password (likely OAuth user): ${email}`);
+                        return null;
+                    }
+
+                    console.log(`[Auth] Comparing password for user: ${user.id}`);
+                    const passwordsMatch = await bcrypt.compare(password, user.password);
+                    
+                    if (passwordsMatch) {
+                        console.log(`[Auth] Password match! Returning user: ${user.id}`);
+                        // Return only the fields NextAuth needs - avoid serialization issues
+                        return {
+                            id: user.id,
+                            email: user.email!,
+                            name: user.name || undefined,
+                            image: user.image || undefined,
+                            role: (user as any).role || 'USER',
+                        };
+                    } else {
+                        console.log(`[Auth] Password mismatch for user: ${user.id}`);
+                        return null;
+                    }
                 } catch (err) {
                     console.error('[Auth] Credentials authorize error:', err);
+                    // Log full error details
+                    if (err instanceof Error) {
+                        console.error('[Auth] Error message:', err.message);
+                        console.error('[Auth] Error stack:', err.stack);
+                    }
                     throw err;
                 }
             },
@@ -60,17 +105,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     callbacks: {
         ...authConfig.callbacks,
         async jwt({ token, user }) {
-            if (user) {
-                token.id = user.id;
-                token.email = user.email;
-                token.name = user.name;
-                token.picture = user.image;
-                token.role = (user as any).role;
+            try {
+                if (user) {
+                    token.id = user.id;
+                    token.email = user.email;
+                    token.name = user.name;
+                    token.picture = user.image;
+                    token.role = (user as any).role;
+                }
+                if (token.id) {
+                    token.role = (token.role as string) ?? 'USER';
+                }
+                return token;
+            } catch (err) {
+                console.error('[Auth] JWT callback error:', err);
+                if (err instanceof Error) {
+                    console.error('[Auth] Error message:', err.message);
+                    console.error('[Auth] Error stack:', err.stack);
+                }
+                throw err;
             }
-            if (token.id) {
-                token.role = (token.role as string) ?? 'USER';
-            }
-            return token;
         },
         async session({ session, token }) {
             if (session.user && token.id) {
@@ -82,11 +136,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     // Always fetch role from DB on every request so manual changes take effect
                     const dbUser = await db.user.findUnique({
                         where: { id: token.id as string },
-                        select: { role: true },
                     });
-                    session.user.role = dbUser?.role ?? 'USER';
+                    session.user.role = (dbUser as any)?.role ?? 'USER';
                 } catch (err) {
                     console.error('[Auth] Session callback DB error:', err);
+                    if (err instanceof Error) {
+                        console.error('[Auth] Error message:', err.message);
+                        console.error('[Auth] Error stack:', err.stack);
+                    }
                 }
             }
             return session;
