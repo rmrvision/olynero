@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,7 @@ const MOCK_TOKENS_REMAINING = MOCK_TOKEN_LIMIT - MOCK_TOKENS_USED;
 
 export default function ProfilePage() {
     const { data: session, status } = useSession();
+    const router = useRouter();
     const [projectCount, setProjectCount] = useState<number | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [displayName, setDisplayName] = useState("");
@@ -54,6 +55,13 @@ export default function ProfilePage() {
         getProjectCount().then(setProjectCount).catch(() => setProjectCount(0));
     }, [session?.user?.id]);
 
+    // Single redirect when unauthenticated (avoids "Throttling navigation" from repeated redirects on re-renders)
+    useEffect(() => {
+        if (status === "unauthenticated") {
+            router.replace("/login");
+        }
+    }, [status, router]);
+
     if (status === "loading") {
         return (
             <div className="flex items-center justify-center min-h-[400px] py-20">
@@ -62,7 +70,7 @@ export default function ProfilePage() {
         );
     }
     if (!session?.user) {
-        redirect("/login");
+        return null; // redirect is handled in useEffect
     }
 
     const user = session.user;
