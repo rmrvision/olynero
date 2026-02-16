@@ -62,7 +62,7 @@ export default function ResourcesPage() {
                                 <h3 className="text-2xl font-bold mb-4">{item.title}</h3>
                                 <p className="text-neutral-400 mb-8 leading-relaxed">{item.description}</p>
                                 {item.action === "Читать доки" ? (
-                                    <Link href="/#features">
+                                    <Link href="/documentation">
                                         <Button variant="outline" className="rounded-full border-white/10 hover:bg-white/10 text-white w-full sm:w-auto">
                                             {item.action}
                                             <ArrowRight className="ml-2 size-4" />

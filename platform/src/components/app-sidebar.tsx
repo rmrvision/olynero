@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import { Layers, Settings, ChevronDown, User2, LayoutDashboard, LogOut } from "lucide-react"
 import Link from "next/link"
@@ -23,6 +24,11 @@ import { useSession, signOut } from "next-auth/react"
 export function AppSidebar() {
     const { data: session } = useSession();
     const pathname = usePathname();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     return (
         <Sidebar className="border-r border-white/5 bg-zinc-950/50 backdrop-blur-xl">
@@ -77,48 +83,62 @@ export function AppSidebar() {
             <SidebarFooter className="border-t border-white/5 p-4">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton className="h-12 w-full justify-start gap-3 rounded-xl border border-white/5 bg-white/5 px-3 hover:bg-white/10">
+                        {mounted ? (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <SidebarMenuButton className="h-12 w-full justify-start gap-3 rounded-xl border border-white/5 bg-white/5 px-3 hover:bg-white/10">
+                                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white">
+                                            {session?.user?.image ? (
+                                                <img src={session.user.image} alt="User" className="h-full w-full rounded-full object-cover" />
+                                            ) : (
+                                                <User2 className="h-4 w-4" />
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col items-start gap-0.5 overflow-hidden text-left">
+                                            <span className="text-sm font-medium text-white truncate w-full">{session?.user?.name || "Пользователь"}</span>
+                                            <span className="text-xs text-neutral-500 truncate w-full">{session?.user?.email || "user@olynero.ai"}</span>
+                                        </div>
+                                        <ChevronDown className="ml-auto h-4 w-4 text-neutral-500" />
+                                    </SidebarMenuButton>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    side="top"
+                                    className="w-[--radix-popper-anchor-width] min-w-56 bg-zinc-950 border-white/10 text-white"
+                                >
+                                    <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white">
+                                        <Link href="/profile">
+                                            <User2 className="mr-2 h-4 w-4" />
+                                            <span>Профиль</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white">
+                                        <Link href="/settings">
+                                            <Settings className="mr-2 h-4 w-4" />
+                                            <span>Настройки</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
+                                        onClick={() => signOut({ callbackUrl: "/login" })}
+                                    >
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        <span>Выйти</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        ) : (
+                            <SidebarMenuButton asChild className="h-12 w-full justify-start gap-3 rounded-xl border border-white/5 bg-white/5 px-3">
+                                <Link href="/profile">
                                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-white">
-                                        {session?.user?.image ? (
-                                            <img src={session.user.image} alt="User" className="h-full w-full rounded-full object-cover" />
-                                        ) : (
-                                            <User2 className="h-4 w-4" />
-                                        )}
+                                        <User2 className="h-4 w-4" />
                                     </div>
                                     <div className="flex flex-col items-start gap-0.5 overflow-hidden text-left">
                                         <span className="text-sm font-medium text-white truncate w-full">{session?.user?.name || "Пользователь"}</span>
                                         <span className="text-xs text-neutral-500 truncate w-full">{session?.user?.email || "user@olynero.ai"}</span>
                                     </div>
-                                    <ChevronDown className="ml-auto h-4 w-4 text-neutral-500" />
-                                </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                side="top"
-                                className="w-[--radix-popper-anchor-width] min-w-56 bg-zinc-950 border-white/10 text-white"
-                            >
-                                <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white">
-                                    <Link href="/profile">
-                                        <User2 className="mr-2 h-4 w-4" />
-                                        <span>Профиль</span>
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white">
-                                    <Link href="/settings">
-                                        <Settings className="mr-2 h-4 w-4" />
-                                        <span>Настройки</span>
-                                    </Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
-                                    onClick={() => signOut({ callbackUrl: "/login" })}
-                                >
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Выйти</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                </Link>
+                            </SidebarMenuButton>
+                        )}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>

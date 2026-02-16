@@ -49,24 +49,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.name = user.name;
                 token.picture = user.image;
             }
-            // Always refresh role from DB so manual role changes take effect without re-login
             if (token.id) {
-                const dbUser = await db.user.findUnique({
-                    where: { id: token.id as string },
-                    select: { role: true, isActive: true },
-                });
-                token.role = dbUser?.role ?? 'USER';
-                token.isActive = dbUser?.isActive ?? true;
+                token.role = (token.role as string) ?? 'USER';
             }
             return token;
         },
-        session({ session, token }) {
+        async session({ session, token }) {
             if (session.user && token.id) {
                 session.user.id = token.id as string;
                 session.user.email = (token.email as string) ?? undefined;
                 session.user.name = (token.name as string) ?? undefined;
                 session.user.image = (token.picture as string) ?? undefined;
-                session.user.role = token.role as string;
+                // Always fetch role from DB on every request so manual changes take effect
+                const dbUser = await db.user.findUnique({
+                    where: { id: token.id as string },
+                    select: { role: true },
+                });
+                session.user.role = dbUser?.role ?? 'USER';
             }
             return session;
         },

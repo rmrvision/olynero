@@ -22,10 +22,10 @@ interface SiteHeaderProps {
 }
 
 const navigation = [
-    { name: "Функции", href: "/#features" },
     { name: "Решения", href: "/solutions" },
     { name: "Тарифы", href: "/pricing" },
     { name: "Ресурсы", href: "/resources" },
+    { name: "Документация", href: "/documentation" },
     { name: "FAQ", href: "/faq" },
     { name: "О нас", href: "/about" },
 ]
@@ -44,9 +44,9 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     </span>
                 </Link>
 
-                <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-6 text-sm font-medium">
+                <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-6 text-xs font-medium">
                     {navigation.map((item) => {
-                        const isActive = pathname === item.href || (item.href === "/#features" && pathname === "/")
+                        const isActive = pathname === item.href
                         return (
                             <Link
                                 key={item.href}
@@ -90,7 +90,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        className="py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg px-3 -mx-1 transition-colors"
+                                        className="py-3 text-sm font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg px-3 -mx-1 transition-colors"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         {item.name}
@@ -134,10 +134,10 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                         ) : (
                             <>
                                 <Link href="/login">
-                                    <Button variant="ghost" className="text-white hover:text-white/80 hover:bg-white/10">Войти</Button>
+                                    <Button variant="ghost" size="sm" className="text-xs text-white hover:text-white/80 hover:bg-white/10">Войти</Button>
                                 </Link>
                                 <Link href="/register">
-                                    <Button className="bg-white text-black hover:bg-white/90">Начать</Button>
+                                    <Button size="sm" className="text-xs bg-white text-black hover:bg-white/90">Начать</Button>
                                 </Link>
                             </>
                         )}

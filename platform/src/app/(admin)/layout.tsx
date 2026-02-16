@@ -1,10 +1,26 @@
+import { auth } from "@/auth"
+import { db } from "@/lib/db"
+import { redirect } from "next/navigation"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AdminSidebar } from "@/components/admin-sidebar"
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
 import Image from "next/image"
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+    const session = await auth()
+    const userId = session?.user?.id
+    if (!userId) {
+        redirect("/login")
+    }
+    const dbUser = await db.user.findUnique({
+        where: { id: userId },
+        select: { role: true },
+    })
+    if (dbUser?.role !== "ADMIN") {
+        redirect("/dashboard")
+    }
+
     return (
         <SidebarProvider defaultOpen={false}>
             <div className="flex h-screen w-full bg-zinc-950 text-white overflow-hidden">
