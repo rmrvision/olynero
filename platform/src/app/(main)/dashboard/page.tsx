@@ -18,7 +18,7 @@ export default async function DashboardPage() {
         redirect("/login");
     }
 
-    let projects;
+    let projects: Awaited<ReturnType<typeof getUserProjects>>;
     try {
         projects = await getUserProjects(session.user.id);
     } catch (e) {
