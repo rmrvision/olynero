@@ -1,6 +1,7 @@
 import type { NextAuthConfig } from 'next-auth';
 
 export const authConfig = {
+    trustHost: true, // required behind proxy / custom domain (e.g. olynero.com) to avoid 500 on /api/auth/session
     pages: {
         signIn: '/login',
     },
