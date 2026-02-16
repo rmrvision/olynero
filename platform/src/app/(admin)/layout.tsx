@@ -1,5 +1,4 @@
 import { auth } from "@/auth"
-import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AdminSidebar } from "@/components/admin-sidebar"
@@ -9,15 +8,11 @@ import Image from "next/image"
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
     const session = await auth()
-    const userId = session?.user?.id
-    if (!userId) {
+    if (!session?.user?.id) {
         redirect("/login")
     }
-    const dbUser = await db.user.findUnique({
-        where: { id: userId },
-        select: { role: true },
-    })
-    if (dbUser?.role !== "ADMIN") {
+    const role = (session.user as { role?: string }).role
+    if (role !== "ADMIN") {
         redirect("/dashboard")
     }
 

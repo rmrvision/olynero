@@ -21,17 +21,10 @@ async function getStats() {
 
 export default async function AdminDashboard() {
     const session = await auth();
-    const userId = session?.user?.id;
-    if (!userId) {
+    if (!session?.user?.id) {
         redirect("/login");
     }
-
-    // Проверяем роль напрямую из БД (сессия может кэшироваться)
-    const dbUser = await db.user.findUnique({
-        where: { id: userId },
-        select: { role: true },
-    });
-    if (dbUser?.role !== "ADMIN") {
+    if ((session.user as { role?: string }).role !== "ADMIN") {
         redirect("/dashboard");
     }
 

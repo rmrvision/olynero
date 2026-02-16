@@ -20,6 +20,7 @@ import {
     Sparkles,
     Zap,
     Crown,
+    Shield,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
@@ -45,7 +46,7 @@ export default function ProfilePage() {
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        if (session?.user?.name) setDisplayName((prev) => prev || session.user.name);
+        if (session?.user?.name) setDisplayName((prev) => prev || session.user.name || "");
     }, [session?.user?.name]);
 
     useEffect(() => {
@@ -271,6 +272,23 @@ export default function ProfilePage() {
 
             {/* Quick Links */}
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {(session?.user as { role?: string })?.role === "ADMIN" && (
+                    <Link
+                        href="/admin"
+                        className="flex items-center justify-between p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 hover:bg-amber-500/10 transition-colors group"
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className="size-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <Shield className="size-6 text-amber-400" />
+                            </div>
+                            <div>
+                                <p className="font-medium text-white">Панель администратора</p>
+                                <p className="text-sm text-neutral-400">Управление платформой</p>
+                            </div>
+                        </div>
+                        <ChevronRight className="size-5 text-neutral-500 group-hover:text-white transition-colors" />
+                    </Link>
+                )}
                 <Link
                     href="/dashboard"
                     className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 transition-colors group"
