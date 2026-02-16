@@ -42,7 +42,10 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder /app/.env ./.env
+# Environment variables should be passed at runtime via:
+#   docker run --env-file .env ...
+# or via your hosting provider's environment settings.
+# Do NOT bake .env into the image — it exposes secrets in image layers.
 
 USER nextjs
 
