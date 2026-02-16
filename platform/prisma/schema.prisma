@@ -99,6 +99,8 @@ model File {
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   
+  s3Key     String?  // If present, content is in S3. If null, content is in DB.
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
