@@ -43,3 +43,36 @@ export async function updateProjectVisibilityAction(projectId: string, isPublic:
     revalidatePath(`/project/${projectId}`);
     return { success: true };
 }
+
+export async function updateProjectAction(projectId: string, data: { name?: string; description?: string }) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    const { ProjectUpdateSchema } = await import("@/lib/validation");
+    const validation = ProjectUpdateSchema.safeParse(data);
+    if (!validation.success) {
+        return { success: false, error: validation.error.issues[0].message };
+    }
+
+    const { updateProject } = await import("@/lib/projects");
+    await updateProject(projectId, session.user.id, validation.data);
+
+    revalidatePath("/dashboard");
+    revalidatePath(`/project/${projectId}`);
+    return { success: true };
+}
+
+export async function deleteProjectAction(projectId: string) {
+    const session = await auth();
+    if (!session?.user?.id) {
+        throw new Error("Unauthorized");
+    }
+
+    const { deleteProject } = await import("@/lib/projects");
+    await deleteProject(projectId, session.user.id);
+
+    revalidatePath("/dashboard");
+    return { success: true };
+}

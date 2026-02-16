@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Folder, Clock, ArrowRight, MoreVertical } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
+import { ProjectActionsMenu } from "./project-actions-menu";
 interface Project {
     id: string;
     name: string;
@@ -51,8 +52,13 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
                                 <div className="size-12 rounded-2xl bg-zinc-800/50 flex items-center justify-center text-zinc-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">
                                     <Folder className="size-6" />
                                 </div>
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <ArrowRight className="size-5 text-neutral-500 -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+                                <div className="flex items-center gap-2">
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <ProjectActionsMenu project={project} />
+                                    </div>
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <ArrowRight className="size-5 text-neutral-500 -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+                                    </div>
                                 </div>
                             </div>
 

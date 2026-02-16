@@ -80,6 +80,7 @@ model Project {
   
   isPublic    Boolean  @default(false)
   githubRepo  String?  // e.g. "username/repo-name"
+  deletedAt   DateTime? // Soft delete
 
   files       File[]
   messages    Message[]

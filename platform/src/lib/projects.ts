@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { Project } from "@prisma/client";
 
 import { TEMPLATES } from "@/lib/templates";
 
@@ -40,7 +39,7 @@ export async function getProject(projectId: string, userId?: string) {
         // Files are now fetched separately via getProjectFileTree
     });
 
-    if (!project) return null;
+    if (!project || project.deletedAt) return null;
 
     // Access control:
     // 1. Owner can access
@@ -59,6 +58,7 @@ export async function getUserProjects(userId: string) {
     return await db.project.findMany({
         where: {
             userId,
+            deletedAt: null,
         },
         orderBy: {
             updatedAt: "desc",
@@ -67,10 +67,14 @@ export async function getUserProjects(userId: string) {
 }
 
 export async function deleteProject(projectId: string, userId: string) {
-    return await db.project.delete({
+    // Soft delete
+    return await db.project.update({
         where: {
             id: projectId,
             userId,
+        },
+        data: {
+            deletedAt: new Date(),
         },
     });
 }
@@ -83,6 +87,18 @@ export async function updateProjectVisibility(projectId: string, userId: string,
         },
         data: {
             isPublic,
+        },
+    });
+}
+
+export async function updateProject(projectId: string, userId: string, data: { name?: string; description?: string }) {
+    return await db.project.update({
+        where: {
+            id: projectId,
+            userId,
+        },
+        data: {
+            ...data,
         },
     });
 }

@@ -6,6 +6,11 @@ export const ProjectSchema = z.object({
     isPublic: z.boolean().optional(),
 });
 
+export const ProjectUpdateSchema = ProjectSchema.pick({
+    name: true,
+    description: true,
+}).partial();
+
 export const FileSchema = z.object({
     path: z.string()
         .min(1)
