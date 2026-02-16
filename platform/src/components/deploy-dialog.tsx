@@ -8,6 +8,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Rocket, Cloud, Box } from "lucide-react";
 import { useState } from "react";
@@ -70,24 +76,49 @@ export function DeployDialog({ project }: DeployDialogProps) {
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
-                    <Button
-                        disabled={!project.githubRepo}
-                        onClick={handleVercel}
-                        className="w-full justify-start bg-black border border-white/10 hover:bg-white/5 text-white"
-                    >
-                        <svg className="mr-2 h-4 w-4" viewBox="0 0 1155 1000" fill="currentColor">
-                            <path d="M577.344 0L1154.69 1000H0L577.344 0Z" />
-                        </svg>
-                        Деплой на Vercel
-                    </Button>
-                    <Button
-                        disabled={!project.githubRepo}
-                        onClick={handleNetlify}
-                        className="w-full justify-start bg-[#00ad9f]/10 border border-[#00ad9f]/20 text-[#00ad9f] hover:bg-[#00ad9f]/20"
-                    >
-                        <Cloud className="mr-2 h-4 w-4" />
-                        Деплой на Netlify
-                    </Button>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span>
+                                    <Button
+                                        disabled={!project.githubRepo}
+                                        onClick={handleVercel}
+                                        className="w-full justify-start bg-black border border-white/10 hover:bg-white/5 text-white"
+                                    >
+                                        <svg className="mr-2 h-4 w-4" viewBox="0 0 1155 1000" fill="currentColor">
+                                            <path d="M577.344 0L1154.69 1000H0L577.344 0Z" />
+                                        </svg>
+                                        Деплой на Vercel
+                                    </Button>
+                                </span>
+                            </TooltipTrigger>
+                            {!project.githubRepo && (
+                                <TooltipContent>
+                                    <p>Connect GitHub repository first</p>
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <span>
+                                    <Button
+                                        disabled={!project.githubRepo}
+                                        onClick={handleNetlify}
+                                        className="w-full justify-start bg-[#00ad9f]/10 border border-[#00ad9f]/20 text-[#00ad9f] hover:bg-[#00ad9f]/20 mt-4"
+                                    >
+                                        <Cloud className="mr-2 h-4 w-4" />
+                                        Деплой на Netlify
+                                    </Button>
+                                </span>
+                            </TooltipTrigger>
+                            {!project.githubRepo && (
+                                <TooltipContent>
+                                    <p>Connect GitHub repository first</p>
+                                </TooltipContent>
+                            )}
+                        </Tooltip>
+                    </TooltipProvider>
 
                     <div className="relative my-4">
                         <div className="absolute inset-0 flex items-center">

@@ -32,6 +32,9 @@ export function useWebContainer({ files }: UseWebContainerProps) {
 
         async function boot() {
             if (mountedRef.current) return;
+            // Wait for files to be populated before booting
+            if (files.length === 0) return;
+
             mountedRef.current = true;
 
             try {
@@ -117,7 +120,7 @@ export function useWebContainer({ files }: UseWebContainerProps) {
         return () => {
             isMounted = false;
         };
-    }, []); // Boot once
+    }, [files]); // React to files update
 
     return { instance, loading, error, serverUrl, mountFile: instance?.fs.writeFile, terminalLogs };
 }

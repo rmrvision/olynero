@@ -37,9 +37,7 @@ export async function getProject(projectId: string, userId?: string) {
         where: {
             id: projectId,
         },
-        include: {
-            files: true,
-        },
+        // Files are now fetched separately via getProjectFileTree
     });
 
     if (!project) return null;

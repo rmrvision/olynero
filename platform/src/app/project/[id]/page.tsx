@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { getProject } from "@/lib/projects";
-import { getProjectFiles } from "@/lib/files";
+import { getProjectFileTree } from "@/lib/files";
 import { redirect, notFound } from "next/navigation";
 import ProjectClientPage from "./client-page";
 
@@ -18,10 +18,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         notFound();
     }
 
-    const files = await getProjectFiles(project.id);
+    const fileTree = await getProjectFileTree(project.id);
     // Determine if read-only
     const isOwner = userId === project.userId;
     const isReadOnly = !isOwner;
 
-    return <ProjectClientPage project={project} files={files} isReadOnly={isReadOnly} />;
+    return <ProjectClientPage project={project} initialFileTree={fileTree} isReadOnly={isReadOnly} />;
 }

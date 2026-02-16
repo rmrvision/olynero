@@ -51,13 +51,8 @@ CMD ["npm", "run", "start"]
             return { success: false, message: "Dockerfile already exists" };
         }
 
-        await db.file.create({
-            data: {
-                projectId,
-                path: "Dockerfile",
-                content,
-            },
-        });
+        const { saveFile } = await import("@/lib/files");
+        await saveFile(projectId, "Dockerfile", content);
 
         revalidatePath(`/project/${projectId}`);
         return { success: true };

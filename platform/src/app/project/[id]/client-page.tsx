@@ -11,9 +11,9 @@ import { CodeEditor as Editor } from "@/components/code-editor";
 import { buildFileTree } from "@/lib/file-utils";
 import { useWebContainer } from "@/hooks/use-webcontainer";
 import { useDebouncedCallback } from "use-debounce";
-import { saveFileAction, deleteFileAction } from "@/actions/file-actions";
+import { saveFileAction, deleteFileAction, getFileContentAction, getProjectFilesBatchAction } from "@/actions/file-actions";
 import { toast } from "sonner";
-import { ArrowLeft, Code2, FileIcon, FolderOpen, Monitor, Bot } from "lucide-react";
+import { ArrowLeft, Code2, FileIcon, FolderOpen, Monitor, Bot, Loader2 } from "lucide-react";
 import { Preview as PreviewPanel } from "@/components/preview/preview-panel";
 import { AgentChat } from "@/components/agent-chat";
 import Link from "next/link";
@@ -33,19 +33,46 @@ const getLanguageFromPath = (path: string) => {
 
 interface ProjectClientPageProps {
     project: any;
-    files: any[];
+    initialFileTree: any[]; // Changed from files to initialFileTree
     isReadOnly?: boolean;
 }
 
-export default function ProjectClientPage({ project, files, isReadOnly = false }: ProjectClientPageProps) {
-    const [fileList, setFileList] = useState(files);
+export default function ProjectClientPage({ project, initialFileTree, isReadOnly = false }: ProjectClientPageProps) {
+    // 1. Initialize with lightweight tree
+    const [fileList, setFileList] = useState<any[]>(initialFileTree);
+    const [webContainerFiles, setWebContainerFiles] = useState<any[]>([]); // For WC boot
+
     // Convert flat files to tree
     const fileTree = buildFileTree(fileList);
 
     const [selectedFile, setSelectedFile] = useState<string | null>(null);
     const [fileContent, setFileContent] = useState<string>("// Выберите файл для редактирования");
+    const [isLoadingFile, setIsLoadingFile] = useState(false);
 
-    const { instance, loading: bootLoading, error: bootError, serverUrl, terminalLogs } = useWebContainer({ files });
+    // 2. Background Hydration of full content
+    useEffect(() => {
+        async function hydrate() {
+            try {
+                const result = await getProjectFilesBatchAction(project.id);
+                if (result.success && result.files) {
+                    // Update file list with content so Editor access is fast
+                    setFileList(prev => {
+                        // Merge content into existing tree (preserving any local changes if any?? no, just overwrite for now as we are just mounting)
+                        return result.files;
+                    });
+                    // Trigger WebContainer boot
+                    setWebContainerFiles(result.files);
+                }
+            } catch (e) {
+                console.error("Hydration failed", e);
+                toast.error("Ошибка загрузки файлов");
+            }
+        }
+        hydrate();
+    }, [project.id]);
+
+    // 3. WebContainer now waits for webContainerFiles to be populated
+    const { instance, loading: bootLoading, error: bootError, serverUrl, terminalLogs } = useWebContainer({ files: webContainerFiles });
 
     const connected = !!instance && !bootLoading;
     const [previewKey, setPreviewKey] = useState(0);
@@ -56,11 +83,32 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
         editorRef.current = editor;
     };
 
-    const handleFileSelect = (path: string) => {
+    const handleFileSelect = async (path: string) => {
+        setSelectedFile(path);
+
+        // Optimistic check: do we have content?
         const file = fileList.find(f => f.path === path);
-        if (file) {
-            setSelectedFile(path);
+        if (file && file.content !== undefined) {
             setFileContent(file.content);
+            return;
+        }
+
+        // Lazy load content
+        setIsLoadingFile(true);
+        setFileContent("// Загрузка...");
+        try {
+            const result = await getFileContentAction(project.id, path);
+            if (result.success && result.content) {
+                setFileContent(result.content);
+                // Cache it
+                setFileList(prev => prev.map(f => f.path === path ? { ...f, content: result.content } : f));
+            } else {
+                setFileContent("// Ошибка загрузки файла");
+            }
+        } catch (e) {
+            setFileContent("// Ошибка загрузки файла");
+        } finally {
+            setIsLoadingFile(false);
         }
     };
 
@@ -208,13 +256,21 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                                 Только чтение
                             </span>
                         )}
+                        {/* Loading Indicator for Background Hydration */}
+                        {!connected && webContainerFiles.length === 0 && (
+                            <span className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px]">
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                Загрузка файлов...
+                            </span>
+                        )}
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900/80 border border-white/10">
+                        {/* Status Dot */}
                         <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-red-500'}`} />
                         <span className="text-xs text-neutral-400 font-medium">
-                            {connected ? 'Подключено' : 'Отключено'}
+                            {connected ? 'Подключено' : (webContainerFiles.length > 0 ? 'Запуск...' : 'Ожидание файлов')}
                         </span>
                     </div>
                     {/* Share Dialog */}
@@ -263,22 +319,20 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                         <div className="h-11 px-3 flex items-center gap-1 border-b border-white/10 bg-zinc-900/80">
                             <button
                                 onClick={() => setActiveTab("code")}
-                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
-                                    activeTab === "code"
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeTab === "code"
                                         ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
                                         : "text-neutral-400 hover:text-white hover:bg-white/5"
-                                }`}
+                                    }`}
                             >
                                 <Code2 className="w-4 h-4" />
                                 Код
                             </button>
                             <button
                                 onClick={() => setActiveTab("preview")}
-                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${
-                                    activeTab === "preview"
+                                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeTab === "preview"
                                         ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
                                         : "text-neutral-400 hover:text-white hover:bg-white/5"
-                                }`}
+                                    }`}
                             >
                                 <Monitor className="w-4 h-4" />
                                 Предпросмотр
@@ -296,19 +350,12 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                                             <span className="text-xs font-semibold text-neutral-300">Файлы</span>
                                         </div>
                                         <div className="flex-1 overflow-y-auto p-2 bg-zinc-950/50">
-                                            {bootLoading ? (
-                                                <div className="space-y-2 animate-pulse p-2">
-                                                    {[1, 2, 3].map(i => (
-                                                        <div key={i} className="h-6 bg-white/5 rounded" />
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <FileTree
-                                                    data={fileTree}
-                                                    onSelect={handleFileSelect}
-                                                    selectedPath={selectedFile || undefined}
-                                                />
-                                            )}
+                                            {/* Show Tree immediately using props; no loading state needed here */}
+                                            <FileTree
+                                                data={fileTree}
+                                                onSelect={handleFileSelect}
+                                                selectedPath={selectedFile || undefined}
+                                            />
                                         </div>
                                     </ResizablePanel>
                                     <ResizableHandle className="w-1 bg-white/5 hover:bg-indigo-500/20 cursor-col-resize" />
@@ -325,6 +372,12 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
                                             )}
                                         </div>
                                         <div className="flex-1 relative bg-zinc-900 min-h-0">
+                                            {/* Editor Loading State */}
+                                            {isLoadingFile && (
+                                                <div className="absolute inset-0 z-10 bg-zinc-900/50 flex items-center justify-center">
+                                                    <Loader2 className="w-6 h-6 animate-spin text-indigo-500" />
+                                                </div>
+                                            )}
                                             <Editor
                                                 path={selectedFile || undefined}
                                                 language={selectedFile ? getLanguageFromPath(selectedFile) : 'typescript'}

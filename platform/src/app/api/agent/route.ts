@@ -3,42 +3,12 @@ import { streamText, convertToModelMessages, generateId } from "ai";
 import { db } from "@/lib/db";
 import { auth } from "@/auth";
 import { z } from "zod";
-import { saveFile, deleteFileByPath } from "@/lib/files";
+import { saveFile, deleteFileByPath, isPathSafe } from "@/lib/files";
+import { AgentMessageSchema } from "@/lib/validation";
+import { rateLimit } from "@/lib/rate-limit";
 
 // Allow streaming responses up to 60 seconds
 export const maxDuration = 60;
-
-// --- Simple in-memory rate limiter ---
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_MAX = 20; // max requests per window
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
-
-function checkRateLimit(userId: string): boolean {
-    const now = Date.now();
-    const entry = rateLimitMap.get(userId);
-
-    if (!entry || now > entry.resetAt) {
-        rateLimitMap.set(userId, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-        return true;
-    }
-
-    if (entry.count >= RATE_LIMIT_MAX) {
-        return false;
-    }
-
-    entry.count++;
-    return true;
-}
-
-// Clean up stale entries every 5 minutes
-if (typeof setInterval !== "undefined") {
-    setInterval(() => {
-        const now = Date.now();
-        for (const [key, entry] of rateLimitMap) {
-            if (now > entry.resetAt) rateLimitMap.delete(key);
-        }
-    }, 5 * 60 * 1000);
-}
 
 // Whitelist of allowed commands for the AI agent
 const ALLOWED_COMMAND_PREFIXES = [
@@ -77,15 +47,6 @@ function isCommandAllowed(command: string): boolean {
     return allowed;
 }
 
-// Validate file path to prevent directory traversal
-function isPathSafe(filePath: string): boolean {
-    const normalized = filePath.replace(/\\/g, '/');
-    if (normalized.includes('..')) return false;
-    if (normalized.startsWith('/')) return false;
-    if (normalized.includes('\0')) return false;
-    return true;
-}
-
 export async function POST(req: Request) {
     const session = await auth();
 
@@ -94,15 +55,19 @@ export async function POST(req: Request) {
     }
 
     // Rate limiting
-    if (!checkRateLimit(session.user.id)) {
+    const { success } = await rateLimit(session.user.id);
+    if (!success) {
         return new Response("Too many requests. Please wait a moment.", { status: 429 });
     }
 
-    const { messages, projectId } = await req.json();
+    const json = await req.json();
+    const validation = AgentMessageSchema.safeParse(json);
 
-    if (!projectId) {
-        return new Response("Missing projectId", { status: 400 });
+    if (!validation.success) {
+        return new Response("Invalid request body", { status: 400 });
     }
+
+    const { messages, projectId } = validation.data;
 
     // Verify project ownership
     const project = await db.project.findUnique({
@@ -184,6 +149,9 @@ Environment:
                     path: z.string().describe("The file path to read."),
                 }),
                 execute: async ({ path }: { path: string }) => {
+                    if (!isPathSafe(path)) {
+                        return { error: "Invalid file path" };
+                    }
                     const file = await db.file.findFirst({
                         where: { projectId, path },
                     });
