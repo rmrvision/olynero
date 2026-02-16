@@ -5,8 +5,6 @@ import Link from "next/link";
 import { Folder, Clock, ArrowRight, MoreVertical } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ru } from "date-fns/locale";
-import { CreateProjectButton } from "@/components/create-project-button";
-
 interface Project {
     id: string;
     name: string;
@@ -25,16 +23,15 @@ export function ProjectGrid({ projects }: ProjectGridProps) {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-center py-20 border border-dashed border-white/10 rounded-3xl bg-white/5"
+                className="text-center py-16 border border-dashed border-white/10 rounded-2xl bg-white/[0.02]"
             >
-                <div className="mx-auto size-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6 ring-1 ring-white/10">
-                    <Folder className="size-8 text-neutral-400" />
+                <div className="mx-auto size-14 rounded-2xl bg-white/5 flex items-center justify-center mb-4 ring-1 ring-white/10">
+                    <Folder className="size-7 text-neutral-500" />
                 </div>
-                <h3 className="text-xl font-medium text-white mb-2">Нет проектов</h3>
-                <p className="text-neutral-400 mb-8 max-w-sm mx-auto">
-                    Создайте первый проект, чтобы начать разработку ИИ-приложений.
+                <h3 className="text-lg font-medium text-white mb-1">Пока нет проектов</h3>
+                <p className="text-sm text-neutral-500 max-w-sm mx-auto">
+                    Введите описание выше, чтобы создать первый проект
                 </p>
-                <CreateProjectButton />
             </motion.div>
         );
     }

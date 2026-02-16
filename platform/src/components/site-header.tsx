@@ -37,7 +37,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
     return (
         <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-xl supports-[backdrop-filter]:bg-black/20">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center relative">
-                <Link href={user ? "/dashboard" : "/"} className="flex items-center space-x-2 shrink-0">
+                <Link href="/" className="flex items-center space-x-2 shrink-0">
                     <Image src="/olynero-logo.png" alt="Olynero" width={28} height={28} className="size-7" priority />
                     <span className="hidden font-unbounded font-bold sm:inline-block text-white">
                         Olynero
@@ -76,7 +76,7 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                     <SheetContent side="left" className="pr-0 bg-black border-white/10 text-white">
                         <div className="px-7">
                             <Link
-                                href={user ? "/dashboard" : "/"}
+                                href="/"
                                 className="flex items-center"
                                 onClick={() => setIsOpen(false)}
                             >

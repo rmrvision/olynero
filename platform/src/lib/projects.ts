@@ -3,12 +3,13 @@ import { Project } from "@prisma/client";
 
 import { TEMPLATES } from "@/lib/templates";
 
-export async function createProject(userId: string, name: string, description?: string, templateName: string = "react-vite") {
+export async function createProject(userId: string, name: string, description?: string, templateName: string = "react-vite", isPublic: boolean = false) {
     const project = await db.project.create({
         data: {
             userId,
             name,
             description,
+            isPublic,
         },
     });
 

@@ -27,7 +27,7 @@ export function AppSidebar() {
     return (
         <Sidebar className="border-r border-white/5 bg-zinc-950/50 backdrop-blur-xl">
             <SidebarHeader className="border-b border-white/5 p-4">
-                <Link href="/dashboard" className="flex items-center gap-3">
+                <Link href="/" className="flex items-center gap-3">
                     <Image src="/olynero-logo.png" alt="Olynero" width={32} height={32} className="size-8" />
                     <div className="flex flex-col gap-0.5">
                         <span className="font-semibold text-white">Olynero AI</span>
