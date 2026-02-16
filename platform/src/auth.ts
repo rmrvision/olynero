@@ -6,20 +6,21 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
-// Validate critical environment variables
+// Validate critical environment variables (only log warnings, don't throw during build)
+// Note: AUTH_SECRET may not be available during build time but should be set at runtime
 if (!process.env.AUTH_SECRET) {
     const env = process.env.NODE_ENV || 'development';
-    console.error(`[Auth] ⚠️  AUTH_SECRET is not set (env: ${env}). This will cause 500 errors on auth callbacks.`);
-    if (env === 'production') {
-        throw new Error('AUTH_SECRET must be set in production');
-    }
+    console.warn(`[Auth] ⚠️  AUTH_SECRET is not set (env: ${env}). Make sure it's set in your deployment environment variables.`);
 } else {
-    console.log('[Auth] ✓ AUTH_SECRET is set');
+    // Only log in development to avoid noise in production logs
+    if (process.env.NODE_ENV !== 'production') {
+        console.log('[Auth] ✓ AUTH_SECRET is set');
+    }
 }
 
-if (process.env.AUTH_URL) {
+if (process.env.AUTH_URL && process.env.NODE_ENV !== 'production') {
     console.log(`[Auth] ✓ AUTH_URL is set to: ${process.env.AUTH_URL}`);
-} else {
+} else if (!process.env.AUTH_URL) {
     console.warn('[Auth] ⚠️  AUTH_URL is not set. NextAuth will try to detect it automatically.');
 }
 
