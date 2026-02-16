@@ -40,13 +40,13 @@ export function ShareDialog({ project, userId }: ShareDialogProps) {
         try {
             const result = await updateProjectVisibilityAction(project.id, checked);
             if (result.success) {
-                toast.success(checked ? "Project is now Public" : "Project is now Private");
+                toast.success(checked ? "Проект теперь публичный" : "Проект теперь приватный");
             } else {
-                throw new Error("Failed to update visibility");
+                throw new Error("Не удалось обновить видимость");
             }
         } catch (error) {
             setIsPublic(!checked); // Revert
-            toast.error("Failed to update visibility");
+            toast.error("Не удалось обновить видимость");
             console.error(error);
         } finally {
             setIsLoading(false);
@@ -55,7 +55,7 @@ export function ShareDialog({ project, userId }: ShareDialogProps) {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(publicUrl);
-        toast.success("Link copied to clipboard");
+        toast.success("Ссылка скопирована");
     };
 
     const handleExport = () => {
@@ -68,14 +68,14 @@ export function ShareDialog({ project, userId }: ShareDialogProps) {
             <DialogTrigger asChild>
                 <Button variant="ghost" size="sm" className="text-neutral-400 hover:text-white hover:bg-white/5 gap-2">
                     <Share2 className="w-4 h-4" />
-                    Share
+                    Поделиться
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md bg-zinc-950 border-white/10 text-white">
                 <DialogHeader>
-                    <DialogTitle>Share Project</DialogTitle>
+                    <DialogTitle>Поделиться проектом</DialogTitle>
                     <DialogDescription className="text-neutral-400">
-                        Manage implementation details for sharing access and exporting your project.
+                        Управляйте доступом и экспортом вашего проекта.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-6 py-4">
@@ -87,12 +87,12 @@ export function ShareDialog({ project, userId }: ShareDialogProps) {
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="public-mode" className="text-sm font-medium leading-none text-white">
-                                    Public Access
+                                    Публичный доступ
                                 </Label>
                                 <p className="text-xs text-neutral-400">
                                     {isPublic
-                                        ? "Anyone with the link can view this project."
-                                        : "Only you can access this project."}
+                                        ? "Любой, у кого есть ссылка, может просматривать проект."
+                                        : "Только вы имеете доступ к проекту."}
                                 </p>
                             </div>
                         </div>
@@ -109,7 +109,7 @@ export function ShareDialog({ project, userId }: ShareDialogProps) {
                         <div className="flex items-center space-x-2">
                             <div className="grid flex-1 gap-2">
                                 <Label htmlFor="link" className="sr-only">
-                                    Link
+                                    Ссылка
                                 </Label>
                                 <Input
                                     id="link"
@@ -119,7 +119,7 @@ export function ShareDialog({ project, userId }: ShareDialogProps) {
                                 />
                             </div>
                             <Button type="button" size="sm" className="px-3" onClick={copyToClipboard}>
-                                <span className="sr-only">Copy</span>
+                                <span className="sr-only">Копировать</span>
                                 <Copy className="h-4 w-4" />
                             </Button>
                         </div>
@@ -128,7 +128,7 @@ export function ShareDialog({ project, userId }: ShareDialogProps) {
                     <div className="border-t border-white/10 pt-4">
                         <Button variant="outline" className="w-full border-white/10 text-neutral-300 hover:bg-white/5 hover:text-white" onClick={handleExport}>
                             <Download className="mr-2 h-4 w-4" />
-                            Export as ZIP
+                            Экспорт в ZIP
                         </Button>
                     </div>
                 </div>

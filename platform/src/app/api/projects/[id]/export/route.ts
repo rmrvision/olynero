@@ -31,7 +31,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
         const zipBuffer = zip.toBuffer();
 
-        return new Response(zipBuffer as any, {
+        return new Response(zipBuffer as unknown as BodyInit, {
             status: 200,
             headers: {
                 "Content-Type": "application/zip",

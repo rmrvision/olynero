@@ -22,6 +22,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   projects      Project[]
+  apiKeys       ApiKey[]
 }
 
 enum UserRole {
@@ -130,6 +131,19 @@ model Action {
   updatedAt DateTime    @updatedAt
 
   @@index([projectId])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  name      String   // e.g. "My App Key"
+  key       String   @unique // hashed key, prefix shown to user
+  prefix    String   // first 8 chars of the key for display (e.g. "olyn_abc1...")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastUsedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 enum Role {

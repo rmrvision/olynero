@@ -26,22 +26,19 @@ import { signOut } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { getProjectCount } from "./actions";
+import { getProjectCount, getTokenUsage } from "./actions";
+import { updateProfile } from "@/actions/auth-actions";
 
 function getAvatarUrl(user: { image?: string | null; email?: string | null; id?: string | null }) {
     if (user.image) return user.image;
     return `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(user.email || user.id || "user")}`;
 }
 
-// TODO: заменить на реальные данные из БД когда будет система токенов
-const MOCK_TOKEN_LIMIT = 100000;
-const MOCK_TOKENS_USED = 42350;
-const MOCK_TOKENS_REMAINING = MOCK_TOKEN_LIMIT - MOCK_TOKENS_USED;
-
 export default function ProfilePage() {
-    const { data: session, status } = useSession();
+    const { data: session, status, update: updateSession } = useSession();
     const router = useRouter();
     const [projectCount, setProjectCount] = useState<number | null>(null);
+    const [tokenUsage, setTokenUsage] = useState<{ used: number; limit: number }>({ used: 0, limit: 100000 });
     const [isEditing, setIsEditing] = useState(false);
     const [displayName, setDisplayName] = useState("");
     const [isSaving, setIsSaving] = useState(false);
@@ -53,9 +50,9 @@ export default function ProfilePage() {
     useEffect(() => {
         if (!session?.user?.id) return;
         getProjectCount().then(setProjectCount).catch(() => setProjectCount(0));
+        getTokenUsage().then(setTokenUsage).catch(() => {});
     }, [session?.user?.id]);
 
-    // Single redirect when unauthenticated (avoids "Throttling navigation" from repeated redirects on re-renders)
     useEffect(() => {
         if (status === "unauthenticated") {
             router.replace("/login");
@@ -70,26 +67,39 @@ export default function ProfilePage() {
         );
     }
     if (!session?.user) {
-        return null; // redirect is handled in useEffect
+        return null;
     }
 
     const user = session.user;
     const avatarUrl = getAvatarUrl(user);
 
+    const tokensUsed = tokenUsage.used;
+    const tokenLimit = tokenUsage.limit;
+    const tokensRemaining = Math.max(0, tokenLimit - tokensUsed);
+    const usedPercent = tokenLimit > 0 ? Math.round((tokensUsed / tokenLimit) * 100) : 0;
+
     const handleSaveProfile = async () => {
+        const trimmed = displayName.trim();
+        if (!trimmed) {
+            toast.error("Имя не может быть пустым");
+            return;
+        }
         setIsSaving(true);
         try {
-            await new Promise((r) => setTimeout(r, 800));
-            toast.success("Профиль обновлён");
-            setIsEditing(false);
+            const result = await updateProfile(trimmed);
+            if (result.error) {
+                toast.error(result.error);
+            } else {
+                toast.success("Профиль обновлён");
+                await updateSession({ name: trimmed });
+                setIsEditing(false);
+            }
         } catch {
             toast.error("Не удалось сохранить");
         } finally {
             setIsSaving(false);
         }
     };
-
-    const usedPercent = Math.round((MOCK_TOKENS_USED / MOCK_TOKEN_LIMIT) * 100);
 
     return (
         <div className="p-6 md:p-10 max-w-4xl mx-auto text-white">
@@ -174,7 +184,7 @@ export default function ProfilePage() {
                         </div>
                         <div>
                             <p className="font-semibold text-white">Бесплатный</p>
-                            <p className="text-xs text-neutral-400">100 000 токенов в месяц</p>
+                            <p className="text-xs text-neutral-400">{tokenLimit.toLocaleString("ru-RU")} токенов в месяц</p>
                         </div>
                     </div>
                     <Link href="/pricing" className="ml-auto">
@@ -201,21 +211,21 @@ export default function ProfilePage() {
                     <div className="rounded-xl bg-black/30 border border-white/5 p-5">
                         <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Всего</p>
                         <p className="text-2xl font-bold text-white tabular-nums">
-                            {MOCK_TOKEN_LIMIT.toLocaleString("ru-RU")}
+                            {tokenLimit.toLocaleString("ru-RU")}
                         </p>
                         <p className="text-xs text-neutral-500 mt-1">токенов в этом месяце</p>
                     </div>
                     <div className="rounded-xl bg-black/30 border border-white/5 p-5">
                         <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1">Использовано</p>
                         <p className="text-2xl font-bold text-amber-400 tabular-nums">
-                            {MOCK_TOKENS_USED.toLocaleString("ru-RU")}
+                            {tokensUsed.toLocaleString("ru-RU")}
                         </p>
                         <p className="text-xs text-neutral-500 mt-1">{usedPercent}% от лимита</p>
                     </div>
                     <div className="rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 p-5">
                         <p className="text-xs font-medium text-emerald-400/80 uppercase tracking-wider mb-1">Осталось</p>
                         <p className="text-2xl font-bold text-emerald-400 tabular-nums">
-                            {MOCK_TOKENS_REMAINING.toLocaleString("ru-RU")}
+                            {tokensRemaining.toLocaleString("ru-RU")}
                         </p>
                         <p className="text-xs text-neutral-500 mt-1">до конца периода</p>
                     </div>

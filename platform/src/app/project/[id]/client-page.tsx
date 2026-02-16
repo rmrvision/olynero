@@ -178,7 +178,7 @@ export default function ProjectClientPage({ project, files, isReadOnly = false }
 
             process.output.pipeTo(new WritableStream({
                 write(data) {
-                    console.log(`[${command}]`, data);
+                    // output captured by WebContainer
                 }
             }));
 

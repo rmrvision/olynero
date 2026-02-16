@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
@@ -41,33 +41,32 @@ export function AgentChat({ projectId, onUpdateFile, onCreateFile, onDeleteFile,
         }),
         maxSteps: 5,
         onToolCall: async ({ toolCall }: { toolCall: any }) => {
-            console.log("Tool call:", toolCall);
             if (toolCall.toolName === 'updateFile') {
                 const { path, content } = toolCall.args;
-                toast.info(`Updating ${path}...`);
+                toast.info(`Обновление ${path}...`);
                 onUpdateFile(path, content);
-                addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: "File updated successfully." });
+                addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: "Файл обновлён." });
             }
             if (toolCall.toolName === 'createFile') {
                 const { path, content } = toolCall.args;
-                toast.info(`Creating ${path}...`);
+                toast.info(`Создание ${path}...`);
                 onCreateFile(path, content);
-                addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: "File created successfully." });
+                addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: "Файл создан." });
             }
             if (toolCall.toolName === 'deleteFile') {
                 const { path } = toolCall.args;
-                toast.info(`Deleting ${path}...`);
+                toast.info(`Удаление ${path}...`);
                 onDeleteFile(path);
-                addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: "File deleted successfully." });
+                addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: "Файл удалён." });
             }
             if (toolCall.toolName === 'runCommand') {
                 const { command } = toolCall.args;
-                toast.info(`Running ${command}...`);
+                toast.info(`Выполнение ${command}...`);
                 onRunCommand(command);
-                addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: "Command executed." });
+                addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: "Команда выполнена." });
             }
             if (toolCall.toolName === 'getTerminalLogs') {
-                const logs = terminalLogs.join('\n') || "No logs available.";
+                const logs = terminalLogs.join('\n') || "Логи отсутствуют.";
                 addToolResult({ tool: toolCall.toolName, toolCallId: toolCall.toolCallId, output: logs });
             }
         },
@@ -109,6 +108,19 @@ export function AgentChat({ projectId, onUpdateFile, onCreateFile, onDeleteFile,
     const removeFile = (index: number) => {
         setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
     };
+
+    // Cache blob URLs and revoke on change to prevent memory leaks
+    const previewUrls = useMemo(() => {
+        return attachedFiles.map((f) =>
+            ACCEPTED_IMAGE_TYPES.includes(f.type) ? URL.createObjectURL(f) : null
+        );
+    }, [attachedFiles]);
+
+    useEffect(() => {
+        return () => {
+            previewUrls.forEach((url) => { if (url) URL.revokeObjectURL(url); });
+        };
+    }, [previewUrls]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInput(e.target.value);
@@ -196,7 +208,7 @@ export function AgentChat({ projectId, onUpdateFile, onCreateFile, onDeleteFile,
                                         <Terminal className="w-3 h-3" />
                                         <span className="font-mono">{tool.toolName ?? tool.type?.replace("tool-", "")}</span>
                                         <span className="ml-auto text-[10px] opacity-50">
-                                            {tool.state === 'result' || tool.state === 'output-available' || tool.state === 'output-error' ? 'Completed' : 'Running...'}
+                                            {tool.state === 'result' || tool.state === 'output-available' || tool.state === 'output-error' ? 'Завершено' : 'Выполняется...'}
                                         </span>
                                     </div>
                                     {(tool.args ?? tool.input) && (
@@ -220,7 +232,7 @@ export function AgentChat({ projectId, onUpdateFile, onCreateFile, onDeleteFile,
                             <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
                         </div>
                         <div className="px-4 py-3 rounded-2xl rounded-tl-sm bg-white/5 border border-white/5 text-sm text-neutral-400 flex items-center gap-2">
-                            Thinking...
+                            Думаю...
                         </div>
                     </motion.div>
                 )}
@@ -237,9 +249,9 @@ export function AgentChat({ projectId, onUpdateFile, onCreateFile, onDeleteFile,
                                         key={i}
                                         className="flex items-center gap-2 px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-xs group/item"
                                     >
-                                        {ACCEPTED_IMAGE_TYPES.includes(file.type) ? (
+                                        {previewUrls[i] ? (
                                             <img
-                                                src={URL.createObjectURL(file)}
+                                                src={previewUrls[i]!}
                                                 alt={file.name}
                                                 className="w-10 h-10 rounded object-cover"
                                             />

@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button"
 import { Check, Zap, Rocket, Building2, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+    title: "Тарифы",
+    description: "Простые и прозрачные тарифы Olynero AI. Начните бесплатно, масштабируйтесь по мере роста.",
+}
 
 export default function PricingPage() {
     return (

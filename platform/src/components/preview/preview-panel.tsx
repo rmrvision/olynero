@@ -22,7 +22,7 @@ export const Preview: React.FC<PreviewProps> = ({ webContainer, serverUrl }) => 
             <div className="h-10 border-b border-slate-700 bg-slate-900 flex items-center px-4 justify-between">
                 <div className="text-xs text-slate-400 flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${serverUrl ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`}></div>
-                    {serverUrl || "Booting environment..."}
+                    {serverUrl || "Запуск окружения..."}
                 </div>
             </div>
 
@@ -31,7 +31,7 @@ export const Preview: React.FC<PreviewProps> = ({ webContainer, serverUrl }) => 
                 {!serverUrl && (
                     <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-slate-500 gap-2">
                         <Loader2 className="animate-spin w-4 h-4" />
-                        <span>Waiting for server...</span>
+                        <span>Ожидание сервера...</span>
                     </div>
                 )}
                 {serverUrl && (

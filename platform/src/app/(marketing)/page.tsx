@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Bot, Code2, Cpu, Globe, Rocket, Shield, Sparkles, Zap } from "lucide-react"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+    title: "Olynero AI — ИИ-платформа для разработки приложений",
+    description: "Создавайте, тестируйте и деплойте ИИ-приложения в одном месте. Быстрый старт, WebContainer, AI-агент.",
+}
 
 export default function LandingPage() {
     return (

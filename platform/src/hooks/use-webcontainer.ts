@@ -36,75 +36,79 @@ export function useWebContainer({ files }: UseWebContainerProps) {
 
             try {
                 setLoading(true);
-                console.log("Booting WebContainer...");
                 const webcontainer = await getWebContainerInstance();
 
-                if (isMounted) {
-                    setInstance(webcontainer);
+                if (!isMounted) return;
 
-                    const fileSystemTree: any = {};
+                setInstance(webcontainer);
 
-                    files.forEach(file => {
-                        const parts = file.path.split('/').filter(Boolean);
-                        let currentLevel: any = fileSystemTree;
+                const fileSystemTree: any = {};
 
-                        parts.forEach((part, index) => {
-                            const isFile = index === parts.length - 1;
-                            if (isFile) {
-                                currentLevel[part] = {
-                                    file: {
-                                        contents: file.content
-                                    }
-                                };
-                            } else {
-                                if (!currentLevel[part]) {
-                                    currentLevel[part] = { directory: {} };
+                files.forEach(file => {
+                    const parts = file.path.split('/').filter(Boolean);
+                    let currentLevel: any = fileSystemTree;
+
+                    parts.forEach((part, index) => {
+                        const isFile = index === parts.length - 1;
+                        if (isFile) {
+                            currentLevel[part] = {
+                                file: {
+                                    contents: file.content
                                 }
-                                currentLevel = currentLevel[part].directory;
+                            };
+                        } else {
+                            if (!currentLevel[part]) {
+                                currentLevel[part] = { directory: {} };
                             }
-                        });
+                            currentLevel = currentLevel[part].directory;
+                        }
                     });
+                });
 
-                    console.log("Mounting files:", fileSystemTree);
-                    await webcontainer.mount(fileSystemTree);
+                await webcontainer.mount(fileSystemTree);
 
-                    // Install dependencies if package.json exists
-                    if (fileSystemTree['package.json']) {
-                        console.log("Installing dependencies...");
-                        addLog("[System] Installing dependencies...\n");
-                        const installProcess = await webcontainer.spawn('npm', ['install']);
-                        installProcess.output.pipeTo(new WritableStream({
-                            write(data) {
-                                console.log('[npm install]', data);
-                                addLog(data);
-                            }
-                        }));
-                        await installProcess.exit;
-                    }
-
-                    console.log("Starting dev server...");
-                    addLog("[System] Starting dev server...\n");
-                    const devProcess = await webcontainer.spawn('npm', ['run', 'dev']);
-                    devProcess.output.pipeTo(new WritableStream({
+                // Install dependencies if package.json exists
+                if (fileSystemTree['package.json']) {
+                    addLog("[System] Installing dependencies...\n");
+                    const installProcess = await webcontainer.spawn('npm', ['install']);
+                    installProcess.output.pipeTo(new WritableStream({
                         write(data) {
-                            console.log('[dev server]', data);
                             addLog(data);
                         }
                     }));
-
-                    webcontainer.on('server-ready', (port, url) => {
-                        console.log('Server ready:', port, url);
-                        setServerUrl(url);
-                        addLog(`[System] Server ready at ${url}\n`);
-                    });
-
-                    console.log("WebContainer ready.");
+                    await installProcess.exit;
                 }
+
+                addLog("[System] Starting dev server...\n");
+                const devProcess = await webcontainer.spawn('npm', ['run', 'dev']);
+                devProcess.output.pipeTo(new WritableStream({
+                    write(data) {
+                        addLog(data);
+                    }
+                }));
+
+                // Listen for server-ready — only then mark loading as false
+                webcontainer.on('server-ready', (port, url) => {
+                    if (isMounted) {
+                        setServerUrl(url);
+                        setLoading(false);
+                        addLog(`[System] Server ready at ${url}\n`);
+                    }
+                });
+
+                // Fallback timeout: if server doesn't start within 60s, stop loading anyway
+                setTimeout(() => {
+                    if (isMounted) {
+                        setLoading(false);
+                    }
+                }, 60000);
+
             } catch (err) {
                 console.error("Failed to boot WebContainer:", err);
-                if (isMounted) setError(err instanceof Error ? err.message : "Failed to boot");
-            } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setError(err instanceof Error ? err.message : "Failed to boot");
+                    setLoading(false);
+                }
             }
         }
 

@@ -94,7 +94,7 @@ export function DeployDialog({ project }: DeployDialogProps) {
                             <span className="w-full border-t border-white/10" />
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-zinc-950 px-2 text-neutral-500">Self-Hosting</span>
+                            <span className="bg-zinc-950 px-2 text-neutral-500">Свой сервер</span>
                         </div>
                     </div>
 
