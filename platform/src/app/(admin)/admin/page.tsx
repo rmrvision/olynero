@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
                         <Link href="/admin/users" className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors">Все →</Link>
                     </div>
                     <div className="space-y-3">
-                        {stats.recentUsers.map((user: any) => (
+                        {stats.recentUsers.map((user: { id: string; name: string | null; email: string; createdAt: Date }) => (
                             <Link key={user.id} href={`/admin/users/${user.id}`} className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all group">
                                 <div className="flex items-center gap-3">
                                     <div className="size-10 rounded-full bg-neutral-800 flex items-center justify-center font-bold text-neutral-400 group-hover:bg-indigo-500/20 group-hover:text-indigo-400 transition-colors">

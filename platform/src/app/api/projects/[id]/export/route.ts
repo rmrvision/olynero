@@ -23,7 +23,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         const zip = new AdmZip();
 
         // Add files to zip
-        files.forEach((file) => {
+        files.forEach((file: { path: string; content: string }) => {
             // Remove leading slash if present to avoid zip issues
             const cleanPath = file.path.startsWith('/') ? file.path.slice(1) : file.path;
             zip.addFile(cleanPath, Buffer.from(file.content, "utf-8"));
