@@ -9,7 +9,7 @@ export function SiteFooter() {
                 <div className="col-span-2 lg:col-span-2">
                     <div className="flex items-center gap-2 mb-4">
                         <Image src="/olynero-logo.png" alt="Olynero" width={28} height={28} className="size-7" />
-                        <span className="text-lg font-bold">Olynero</span>
+                        <span className="font-unbounded text-lg font-bold">Olynero</span>
                     </div>
                     <p className="text-sm text-neutral-400 max-w-xs mb-6">
                         Расширяем возможности нового поколения создателей с помощью передовых ИИ-инструментов.
@@ -55,9 +55,9 @@ export function SiteFooter() {
                 </div>
             </div>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-500">
-                <p>&copy; {new Date().getFullYear()} Olynero Inc. Все права защищены.</p>
+                <p>&copy; {new Date().getFullYear()} <span className="font-unbounded">Olynero</span> Inc. Все права защищены.</p>
                 <div className="flex gap-6">
-                    <span>Сделано командой Olynero</span>
+                    <span>Сделано командой <span className="font-unbounded">Olynero</span></span>
                 </div>
             </div>
         </footer>

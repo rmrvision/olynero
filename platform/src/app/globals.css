@@ -104,6 +104,10 @@
 }
 
 @layer utilities {
+  .font-unbounded {
+    font-family: var(--font-unbounded), sans-serif;
+  }
+
   .glass-panel {
     @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-xl;
   }

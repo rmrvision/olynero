@@ -57,6 +57,12 @@ export function AppSidebar() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
+                                <SidebarMenuButton asChild isActive={pathname === "/profile"} className="text-neutral-400 hover:bg-white/5 hover:text-white data-[active=true]:bg-white/5 data-[active=true]:text-white">
+                                    <Link href="/profile">
+                                        <User2 className="h-4 w-4" />
+                                        <span>Профиль</span>
+                                    </Link>
+                                </SidebarMenuButton>
                                 <SidebarMenuButton asChild isActive={pathname === "/settings"} className="text-neutral-400 hover:bg-white/5 hover:text-white data-[active=true]:bg-white/5 data-[active=true]:text-white">
                                     <Link href="/settings">
                                         <Settings className="h-4 w-4" />
@@ -92,6 +98,12 @@ export function AppSidebar() {
                                 side="top"
                                 className="w-[--radix-popper-anchor-width] min-w-56 bg-zinc-950 border-white/10 text-white"
                             >
+                                <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white">
+                                    <Link href="/profile">
+                                        <User2 className="mr-2 h-4 w-4" />
+                                        <span>Профиль</span>
+                                    </Link>
+                                </DropdownMenuItem>
                                 <DropdownMenuItem asChild className="focus:bg-white/5 focus:text-white">
                                     <Link href="/settings">
                                         <Settings className="mr-2 h-4 w-4" />

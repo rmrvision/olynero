@@ -53,12 +53,15 @@ export async function register(input: RegisterInput) {
             return { error: 'Email already exists' };
         }
 
+        const identiconUrl = `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(email)}`;
+
         console.log("[Auth Action] Creating user in DB...");
         const newUser = await db.user.create({
             data: {
                 name,
                 email,
                 password: hashedPassword,
+                image: identiconUrl,
             },
         });
         console.log("[Auth Action] User created successfully:", newUser.id);

@@ -13,6 +13,7 @@ import {
 
 const routeLabels: Record<string, string> = {
     dashboard: "Дашборд",
+    profile: "Профиль",
     settings: "Настройки",
 }
 

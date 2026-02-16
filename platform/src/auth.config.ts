@@ -12,6 +12,7 @@ export const authConfig = {
             const isLoggedIn = !!auth?.user;
             const isOnProject = nextUrl.pathname.startsWith('/project');
             const isOnSettings = nextUrl.pathname.startsWith('/settings');
+            const isOnProfile = nextUrl.pathname.startsWith('/profile');
             const isOnAdmin = nextUrl.pathname.startsWith('/admin');
 
             // Admin routes: require login + ADMIN role
@@ -25,7 +26,7 @@ export const authConfig = {
             }
 
             // Protected user routes
-            if (isOnProject || isOnSettings) {
+            if (isOnProject || isOnSettings || isOnProfile) {
                 if (isLoggedIn) return true;
                 return false;
             } else if (isLoggedIn) {

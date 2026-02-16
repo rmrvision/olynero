@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, IBM_Plex_Mono, Lora } from "next/font/google"; // Updated fonts based on theme
+import { Plus_Jakarta_Sans, IBM_Plex_Mono, Lora, Unbounded } from "next/font/google";
 import "./globals.css";
 
 const fontSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
+});
+
+const fontUnbounded = Unbounded({
+  variable: "--font-unbounded",
+  subsets: ["latin", "cyrillic"],
 });
 
 const fontMono = IBM_Plex_Mono({
@@ -36,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="ru" className="dark">
       <body
-        className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} antialiased`}
+        className={`${fontSans.variable} ${fontMono.variable} ${fontSerif.variable} ${fontUnbounded.variable} antialiased`}
       >
         <Providers>
           {children}

@@ -5,7 +5,8 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, Zap, Lightbulb, CreditCard, BookOpen, HelpCircle, Info } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Menu } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 // import { User } from "next-auth" // Importing from next-auth in client component might be tricky if not careful with types, better to use any or define simple shape
@@ -13,6 +14,7 @@ import { cn } from "@/lib/utils"
 
 interface SiteHeaderProps {
     user?: {
+        id?: string | null
         name?: string | null
         email?: string | null
         image?: string | null
@@ -20,12 +22,12 @@ interface SiteHeaderProps {
 }
 
 const navigation = [
-    { name: "Функции", href: "/#features", icon: Zap },
-    { name: "Решения", href: "/solutions", icon: Lightbulb },
-    { name: "Тарифы", href: "/pricing", icon: CreditCard },
-    { name: "Ресурсы", href: "/resources", icon: BookOpen },
-    { name: "FAQ", href: "/faq", icon: HelpCircle },
-    { name: "О нас", href: "/about", icon: Info },
+    { name: "Функции", href: "/#features" },
+    { name: "Решения", href: "/solutions" },
+    { name: "Тарифы", href: "/pricing" },
+    { name: "Ресурсы", href: "/resources" },
+    { name: "FAQ", href: "/faq" },
+    { name: "О нас", href: "/about" },
 ]
 
 export function SiteHeader({ user }: SiteHeaderProps) {
@@ -34,34 +36,31 @@ export function SiteHeader({ user }: SiteHeaderProps) {
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/50 backdrop-blur-xl supports-[backdrop-filter]:bg-black/20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center">
-                <div className="mr-8 hidden md:flex items-center">
-                    <Link href={user ? "/dashboard" : "/"} className="mr-6 flex items-center space-x-2">
-                        <Image src="/olynero-logo.png" alt="Olynero" width={28} height={28} className="size-7" priority />
-                        <span className="hidden font-bold sm:inline-block text-white">
-                            Olynero
-                        </span>
-                    </Link>
-                    <nav className="flex items-center space-x-6 text-sm font-medium">
-                        {navigation.map((item) => {
-                            const isActive = pathname === item.href || (item.href === "/#features" && pathname === "/")
-                            const Icon = item.icon
-                            return (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className={cn(
-                                        "flex items-center gap-1.5 transition-colors hover:text-white",
-                                        isActive ? "text-white" : "text-neutral-400"
-                                    )}
-                                >
-                                    <Icon className="size-3.5 opacity-70" />
-                                    {item.name}
-                                </Link>
-                            )
-                        })}
-                    </nav>
-                </div>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center relative">
+                <Link href={user ? "/dashboard" : "/"} className="flex items-center space-x-2 shrink-0">
+                    <Image src="/olynero-logo.png" alt="Olynero" width={28} height={28} className="size-7" priority />
+                    <span className="hidden font-unbounded font-bold sm:inline-block text-white">
+                        Olynero
+                    </span>
+                </Link>
+
+                <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center space-x-6 text-sm font-medium">
+                    {navigation.map((item) => {
+                        const isActive = pathname === item.href || (item.href === "/#features" && pathname === "/")
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                    "transition-colors hover:text-white",
+                                    isActive ? "text-white" : "text-neutral-400"
+                                )}
+                            >
+                                {item.name}
+                            </Link>
+                        )
+                    })}
+                </nav>
 
                 {/* Mobile Menu */}
                 <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -82,37 +81,56 @@ export function SiteHeader({ user }: SiteHeaderProps) {
                                 onClick={() => setIsOpen(false)}
                             >
                                 <Image src="/olynero-logo.png" alt="Olynero" width={28} height={28} className="size-7 mr-2" />
-                                <span className="font-bold">Olynero</span>
+                                <span className="font-unbounded font-bold">Olynero</span>
                             </Link>
                         </div>
                         <div className="flex flex-col gap-2 py-4 px-7 mt-4">
                             {navigation.map((item) => {
-                                const Icon = item.icon
                                 return (
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        className="flex items-center gap-3 py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg px-3 -mx-1 transition-colors"
+                                        className="py-3 text-base font-medium text-neutral-300 hover:text-white hover:bg-white/5 rounded-lg px-3 -mx-1 transition-colors"
                                         onClick={() => setIsOpen(false)}
                                     >
-                                        <Icon className="size-4 text-indigo-400" />
                                         {item.name}
                                     </Link>
-                                )
+                                );
                             })}
                         </div>
                     </SheetContent>
                 </Sheet>
 
-                <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-                    <div className="w-full flex-1 md:w-auto md:flex-none">
-                        {/* Search or other items */}
-                    </div>
-                    <nav className="flex items-center space-x-2">
+                <div className="flex flex-1 items-center justify-end gap-2 ml-auto">
+                    <nav className="flex items-center gap-2">
                         {user ? (
-                            <Link href="/dashboard">
-                                <Button size="sm" className="bg-white text-black hover:bg-white/90 font-medium">В консоль</Button>
-                            </Link>
+                            <>
+                                <Link href="/dashboard">
+                                    <Button variant="ghost" size="sm" className="text-white hover:text-white/90 hover:bg-white/10 font-medium">
+                                        Дашборд
+                                    </Button>
+                                </Link>
+                                <Link
+                                    href="/profile"
+                                    className="flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-2 py-1 pr-3 hover:bg-white/10 transition-colors"
+                                >
+                                    <Avatar className="h-8 w-8 ring-1 ring-white/10">
+                                        <AvatarImage
+                                            src={
+                                                user.image ??
+                                                `https://api.dicebear.com/9.x/identicon/svg?seed=${encodeURIComponent(user.email || user.id || "user")}`
+                                            }
+                                            alt={user.name || "Avatar"}
+                                        />
+                                        <AvatarFallback className="bg-indigo-500/20 text-indigo-300 text-sm">
+                                            {(user.name || user.email || "?")[0].toUpperCase()}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-sm font-medium text-white hidden sm:inline">
+                                        {user.name || user.email || "Профиль"}
+                                    </span>
+                                </Link>
+                            </>
                         ) : (
                             <>
                                 <Link href="/login">
