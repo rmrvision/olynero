@@ -6,6 +6,15 @@ import bcrypt from 'bcryptjs';
 import { signIn, auth } from '@/auth';
 import { AuthError } from 'next-auth';
 
+/** Next.js throws redirect as an error; we must rethrow so redirect actually happens */
+function isRedirectError(error: unknown): boolean {
+    if (error && typeof error === 'object' && 'digest' in error) {
+        const digest = (error as { digest?: string }).digest;
+        return typeof digest === 'string' && digest.startsWith('NEXT_REDIRECT');
+    }
+    return false;
+}
+
 const RegisterSchema = z.object({
     name: z.string().min(1, 'Имя обязательно'),
     email: z.string().email('Некорректный email'),
@@ -92,6 +101,8 @@ export async function login(formData: FormData) {
             redirectTo: '/dashboard',
         });
     } catch (error) {
+        // NextAuth redirects by throwing; do not treat as failure
+        if (isRedirectError(error)) throw error;
         if (error instanceof AuthError) {
             switch (error.type) {
                 case 'CredentialsSignin':

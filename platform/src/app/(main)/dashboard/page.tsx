@@ -7,12 +7,24 @@ import { DashboardHeroHeading } from "@/components/dashboard/dashboard-hero-head
 import { DashboardAnimatedBackground } from "@/components/dashboard/dashboard-animated-background";
 
 export default async function DashboardPage() {
-    const session = await auth();
+    let session;
+    try {
+        session = await auth();
+    } catch (e) {
+        console.error("[Dashboard] auth() failed:", e);
+        redirect("/login");
+    }
     if (!session?.user?.id) {
         redirect("/login");
     }
 
-    const projects = await getUserProjects(session.user.id);
+    let projects;
+    try {
+        projects = await getUserProjects(session.user.id);
+    } catch (e) {
+        console.error("[Dashboard] getUserProjects failed:", e);
+        projects = [];
+    }
 
     return (
         <div className="min-h-full w-full flex flex-col">

@@ -133,19 +133,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 session.user.email = (token.email as string) ?? undefined;
                 session.user.name = (token.name as string) ?? undefined;
                 session.user.image = (token.picture as string) ?? undefined;
+                let role: string = 'USER';
                 try {
-                    // Always fetch role from DB on every request so manual changes take effect
                     const dbUser = await db.user.findUnique({
                         where: { id: token.id as string },
                     });
-                    session.user.role = (dbUser as any)?.role ?? 'USER';
+                    role = (dbUser as any)?.role ?? (token.role as string) ?? 'USER';
                 } catch (err) {
                     console.error('[Auth] Session callback DB error:', err);
-                    if (err instanceof Error) {
-                        console.error('[Auth] Error message:', err.message);
-                        console.error('[Auth] Error stack:', err.stack);
-                    }
+                    role = (token.role as string) ?? 'USER';
                 }
+                session.user.role = role;
             }
             return session;
         },
