@@ -19,6 +19,67 @@ type ApiKeyInfo = {
     createdAt: Date;
 };
 
+import { getUserUsageAction } from "@/actions/usage-actions";
+import { Progress } from "@/components/ui/progress";
+import { Database, Zap } from "lucide-react";
+
+function UsageSection() {
+    const [usage, setUsage] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getUserUsageAction().then((res) => {
+            if (res.success) {
+                setUsage(res.usage);
+            }
+        }).finally(() => setLoading(false));
+    }, []);
+
+    if (loading) return <div className="p-8 text-center text-neutral-500">Загрузка статистики...</div>;
+    if (!usage) return null;
+
+    const aiPercent = Math.min(100, (usage.aiTokensUsed / usage.limitAI) * 100);
+    const storagePercent = Math.min(100, (usage.storageUsedBytes / usage.limitStorage) * 100);
+    const storageUsedMB = (usage.storageUsedBytes / (1024 * 1024)).toFixed(2);
+    const limitStorageMB = (usage.limitStorage / (1024 * 1024)).toFixed(0);
+
+    return (
+        <section className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl p-6 md:p-8">
+            <div className="flex items-center gap-4 mb-8">
+                <div className="size-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                    <Database className="size-6 text-amber-400" />
+                </div>
+                <div>
+                    <h2 className="text-xl font-semibold text-white">Лимиты и Квоты</h2>
+                    <p className="text-sm text-neutral-400">Использование ресурсов платформы.</p>
+                </div>
+            </div>
+
+            <div className="space-y-6">
+                <div>
+                    <div className="flex justify-between text-sm mb-2">
+                        <span className="text-neutral-300 flex items-center gap-2">
+                            <Zap className="size-4 text-yellow-400" /> AI Токены
+                        </span>
+                        <span className="text-neutral-400">{usage.aiTokensUsed} / {usage.limitAI}</span>
+                    </div>
+                    <Progress value={aiPercent} className="h-2 bg-black/40" indicatorClassName={aiPercent > 90 ? "bg-red-500" : "bg-indigo-500"} />
+                </div>
+
+                <div>
+                    <div className="flex justify-between text-sm mb-2">
+                        <span className="text-neutral-300 flex items-center gap-2">
+                            <Database className="size-4 text-blue-400" /> Хранилище
+                        </span>
+                        <span className="text-neutral-400">{storageUsedMB} MB / {limitStorageMB} MB</span>
+                    </div>
+                    <Progress value={storagePercent} className="h-2 bg-black/40" indicatorClassName={storagePercent > 90 ? "bg-red-500" : "bg-emerald-500"} />
+                </div>
+            </div>
+        </section>
+    );
+}
+
 export default function SettingsPage() {
     const { data: session, update: updateSession } = useSession();
     const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +95,7 @@ export default function SettingsPage() {
     const [revealedKey, setRevealedKey] = useState<string | null>(null);
 
     useEffect(() => {
-        getApiKeys().then((keys) => setApiKeys(keys as ApiKeyInfo[])).catch(() => {});
+        getApiKeys().then((keys) => setApiKeys(keys as ApiKeyInfo[])).catch(() => { });
     }, []);
 
     const handleSave = async () => {
@@ -164,6 +225,9 @@ export default function SettingsPage() {
                         </Button>
                     </div>
                 </section>
+
+                {/* Usage Section */}
+                <UsageSection />
 
                 {/* API Keys Section */}
                 <section className="rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl p-6 md:p-8">

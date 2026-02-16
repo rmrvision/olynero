@@ -23,6 +23,7 @@ model User {
   sessions      Session[]
   projects      Project[]
   apiKeys       ApiKey[]
+  usage         UserUsage?
 }
 
 enum UserRole {
@@ -153,6 +154,13 @@ enum Role {
   system
 }
 
+enum ActionStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
 enum ActionType {
   CREATE_FILE
   UPDATE_FILE
@@ -161,9 +169,20 @@ enum ActionType {
   DEPLOY
 }
 
-enum ActionStatus {
-  PENDING
-  RUNNING
-  COMPLETED
-  FAILED
+
+
+model UserUsage {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  aiTokensUsed     Int      @default(0)
+  storageUsedBytes Int      @default(0)
+  projectCount     Int      @default(0)
+  
+  limitAI          Int      @default(1000) // Default limit: 1000 requests
+  limitStorage     Int      @default(52428800) // Default limit: 50MB (50 * 1024 * 1024)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

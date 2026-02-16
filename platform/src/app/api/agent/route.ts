@@ -60,6 +60,14 @@ export async function POST(req: Request) {
         return new Response("Too many requests. Please wait a moment.", { status: 429 });
     }
 
+    // Usage Limit Check
+    const { checkAILimit, incrementAITokens } = await import("@/lib/usage");
+    try {
+        await checkAILimit(session.user.id);
+    } catch (e: any) {
+        return new Response(e.message, { status: 403 });
+    }
+
     const json = await req.json();
     const validation = AgentMessageSchema.safeParse(json);
 
@@ -198,6 +206,11 @@ Environment:
 
     return result.toUIMessageStreamResponse({
         originalMessages: messages,
+        onFinish: async (event) => {
+            // Rough key: 1 message ~ 1 token (simplified). Real implementation should use tiktoken.
+            // For now, we increment by 1 for every request + 1 for every tool call
+            await incrementAITokens(session.user.id!, 1);
+        },
         generateMessageId: generateId,
     });
 }

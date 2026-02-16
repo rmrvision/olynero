@@ -56,11 +56,11 @@ export default function ProjectClientPage({ project, initialFileTree, isReadOnly
                 const result = await getProjectFilesBatchAction(project.id);
                 if (result.success && result.files) {
                     // Update file list with content so Editor access is fast
-                    setFileList(prev => {
-                        // Merge content into existing tree (preserving any local changes if any?? no, just overwrite for now as we are just mounting)
-                        return result.files;
-                    });
-                    // Trigger WebContainer boot
+                    // DISABLE FOR LAZY LOADING: Keep fileList lightweight. Content is fetched on demand.
+                    // setFileList(prev => {
+                    //    return result.files;
+                    // });
+                    // Trigger WebContainer boot (Background)
                     setWebContainerFiles(result.files);
                 }
             } catch (e) {
@@ -320,8 +320,8 @@ export default function ProjectClientPage({ project, initialFileTree, isReadOnly
                             <button
                                 onClick={() => setActiveTab("code")}
                                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeTab === "code"
-                                        ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
-                                        : "text-neutral-400 hover:text-white hover:bg-white/5"
+                                    ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"
+                                    : "text-neutral-400 hover:text-white hover:bg-white/5"
                                     }`}
                             >
                                 <Code2 className="w-4 h-4" />
@@ -330,8 +330,8 @@ export default function ProjectClientPage({ project, initialFileTree, isReadOnly
                             <button
                                 onClick={() => setActiveTab("preview")}
                                 className={`px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-2 ${activeTab === "preview"
-                                        ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
-                                        : "text-neutral-400 hover:text-white hover:bg-white/5"
+                                    ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                                    : "text-neutral-400 hover:text-white hover:bg-white/5"
                                     }`}
                             >
                                 <Monitor className="w-4 h-4" />

@@ -29,7 +29,22 @@ export async function saveFileAction(projectId: string, path: string, content: s
         throw new Error(validation.error.issues[0].message);
     }
 
+    const { checkStorageLimit, incrementStorage } = await import("@/lib/usage");
+
+    // Check if update or create
+    // If update, we strictly should calc diff, but for MVP we check full size if create
+    // Simplification: Check limit against new content size roughly
+    try {
+        await checkStorageLimit(session.user.id, content.length);
+    } catch (e: any) {
+        throw new Error(e.message);
+    }
+
     await updateFile(projectId, path, content);
+
+    // We increments storage usage. Note: This is a naive appended counters. 
+    // Real implementation should recalc project size or use DB stats.
+    await incrementStorage(session.user.id, content.length);
 
     return { success: true };
 }
